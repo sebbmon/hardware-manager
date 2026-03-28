@@ -81,7 +81,7 @@ class RentalViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        # "Moje wypożyczenia": zwraca aktywne wpisy dla zalogowanego użytkownika
+        # "My rentals": active rentals for logged in user
         return Rental.objects.filter(user=self.request.user, is_active=True)
 
 from django.contrib.auth import get_user_model
@@ -103,14 +103,14 @@ class AdminHardwareViewSet(viewsets.ModelViewSet):
                 return Response({'detail': 'Equipment not found.'}, status=status.HTTP_404_NOT_FOUND)
                 
             if hardware.status == 'In Use':
-                # Zamyka aktywne wypożyczenie powiązane z tym sprzętem
+                # Closes active rental related to that hardware
                 rental = Rental.objects.filter(hardware=hardware, is_active=True).first()
                 if rental:
                     rental.is_active = False
                     rental.returned_at = timezone.now()
                     rental.save(update_fields=['is_active', 'returned_at'])
             
-            # Wymusza status naprawy
+            # Forces repair status
             hardware.status = 'Repair'
             hardware.save(update_fields=['status'])
             

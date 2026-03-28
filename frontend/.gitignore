@@ -1,38 +1,5 @@
-# Backend
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Baza danych
-db.sqlite3
-db.sqlite3-journal
-*.sqlite3
-
-# Venv
-venv/
-env/
-ENV/
-.venv/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Local conf and system files
-.env
-local_settings.py
-*.log
-.DS_Store
-Thumbs.db
-
-# Static
-static/
-media/
-
-# Frontend
 # dependencies
 /node_modules
 /.pnp
