@@ -7,7 +7,8 @@ class HardwareSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RentalSerializer(serializers.ModelSerializer):
-    hardware_details = HardwareSerializer(source='hardware', read_only=True)
+    #hardware_details = HardwareSerializer(source='hardware', read_only=True)
+    hardware = HardwareSerializer(read_only=True)
 
     class Meta:
         model = Rental

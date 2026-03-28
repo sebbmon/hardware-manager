@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Search, 
-  ChevronDown, 
-  ChevronUp, 
-  Filter, 
-  ShoppingCart, 
-  CheckCircle2, 
-  XCircle, 
-  Wrench, 
+import {
+  Search,
+  ChevronDown,
+  ChevronUp,
+  Filter,
+  ShoppingCart,
+  CheckCircle2,
+  XCircle,
+  Wrench,
   Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -33,7 +33,7 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [sortConfig, setSortConfig] = useState<{ key: keyof Hardware, direction: 'asc' | 'desc' } | null>(null);
-  
+
   const queryClient = useQueryClient();
 
   const rentMutation = useMutation({
@@ -57,7 +57,7 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
 
     // Filter
     if (searchTerm) {
-      result = result.filter(item => 
+      result = result.filter(item =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.brand.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -72,7 +72,7 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
       result.sort((a, b) => {
         const aValue = a[sortConfig.key] || '';
         const bValue = b[sortConfig.key] || '';
-        
+
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
@@ -86,43 +86,43 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
     switch (status) {
       case 'Available':
         return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400 border border-emerald-500/20">
-            <CheckCircle2 className="h-3 w-3" /> Available
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-100">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Available
           </span>
         );
       case 'In Use':
         return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-400 border border-amber-500/20">
-            <XCircle className="h-3 w-3" /> Rented
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-100">
+            <XCircle className="h-3.5 w-3.5" /> Rented
           </span>
         );
       case 'Repair':
         return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-400 border border-red-500/20">
-            <Wrench className="h-3 w-3" /> In Repair
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 border border-red-100">
+            <Wrench className="h-3.5 w-3.5" /> In Repair
           </span>
         );
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-slate-900">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-sm flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             placeholder="Search devices or brands..."
-            className="w-full rounded-xl border border-slate-800 bg-slate-900 py-2 pl-10 pr-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner"
+            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-slate-500" />
+          <Filter className="h-4 w-4 text-slate-400" />
           <select 
-            className="rounded-xl border border-slate-800 bg-slate-900 py-2 px-4 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none transition-all"
+            className="rounded-lg border border-slate-200 bg-white py-2 px-4 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none transition-all shadow-sm"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -134,55 +134,55 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-sm shadow-2xl transition-all">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all text-slate-900">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm border-collapse">
-            <thead className="bg-slate-800/50 border-b border-white/5">
+            <thead className="bg-slate-50 border-b border-slate-200 uppercase tracking-wider">
               <tr>
                 {['name', 'brand', 'status'].map((header) => (
                   <th 
                     key={header}
-                    className="cursor-pointer px-6 py-4 font-semibold text-slate-300 hover:text-white transition-colors capitalize"
+                    className="cursor-pointer px-6 py-4 text-[11px] font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase"
                     onClick={() => handleSort(header as keyof Hardware)}
                   >
                     <div className="flex items-center gap-2">
                       {header}
                       {sortConfig?.key === header ? (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />
                       ) : (
-                        <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                        <ChevronDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100" />
                       )}
                     </div>
                   </th>
                 ))}
-                <th className="px-6 py-4 font-semibold text-slate-300">Actions</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    <td className="px-6 py-4"><div className="h-4 w-32 rounded bg-slate-800" /></td>
-                    <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-800" /></td>
-                    <td className="px-6 py-4"><div className="h-6 w-20 rounded bg-slate-800" /></td>
-                    <td className="px-6 py-4"><div className="h-8 w-24 rounded bg-slate-800" /></td>
+                    <td className="px-6 py-4"><div className="h-4 w-32 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4"><div className="h-6 w-20 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4"><div className="h-8 w-24 rounded bg-slate-100" /></td>
                   </tr>
                 ))
               ) : filteredAndSortedData.length > 0 ? (
                 filteredAndSortedData.map((item) => (
-                  <tr key={item.id} className="hover:bg-indigo-500/5 transition-colors group">
-                    <td className="px-6 py-4 font-medium text-slate-100 group-hover:text-white">{item.name}</td>
-                    <td className="px-6 py-4 text-slate-400 group-hover:text-slate-300">{item.brand}</td>
+                  <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                    <td className="px-6 py-4 font-semibold text-slate-900">{item.name}</td>
+                    <td className="px-6 py-4 text-slate-600">{item.brand}</td>
                     <td className="px-6 py-4">{getStatusBadge(item.status)}</td>
                     <td className="px-6 py-4">
                       <button
                         onClick={() => rentMutation.mutate(item.id)}
                         disabled={item.status !== 'Available' || rentMutation.isPending}
                         className={cn(
-                          "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 active:scale-95",
+                          "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all focus:outline-none focus:ring-2 active:scale-[0.98]",
                           item.status === 'Available' 
-                            ? "bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-500/20 ring-indigo-500/50" 
-                            : "bg-slate-800 text-slate-600 cursor-not-allowed opacity-50"
+                            ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-100 ring-indigo-500/20" 
+                            : "bg-slate-100 text-slate-400 cursor-not-allowed"
                         )}
                       >
                         {rentMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <ShoppingCart className="h-3 w-3" />}
@@ -193,8 +193,8 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-slate-500 italic">
-                    No hardware found matching your search criteria.
+                  <td colSpan={4} className="px-6 py-12 text-center text-slate-400 italic font-medium">
+                    No hardware found matching your criteria.
                   </td>
                 </tr>
               )}

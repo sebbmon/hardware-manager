@@ -18,40 +18,46 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col gap-2">
-        <h1 className="flex items-center gap-3 text-4xl font-extrabold tracking-tight text-white">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600/20 text-indigo-400">
-            <ShieldCheck className="h-7 w-7" />
-          </div>
+    <div className="space-y-12 pb-24">
+      {/* Header */}
+      <div className="border-b border-slate-200 pb-8">
+        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
           Admin Panel
         </h1>
-        <p className="text-lg text-slate-400 max-w-2xl">
+        <p className="mt-4 max-w-2xl text-lg text-slate-500 font-medium">
           Complete control over the hardware inventory and user accounts. Add new assets, manage repairs, and onboard new team members.
         </p>
       </div>
 
-      <section className="space-y-6">
-        <div className="flex items-center gap-2 border-b border-white/5 pb-4">
-          <Settings className="h-5 w-5 text-indigo-400" />
-          <h2 className="text-2xl font-bold text-white">Inventory Management</h2>
-        </div>
-        <AdminForms />
-      </section>
-
-      <section className="space-y-6">
-        <div className="flex items-center gap-2 border-b border-white/5 pb-4">
-          <Package className="h-5 w-5 text-indigo-400" />
-          <h2 className="text-2xl font-bold text-white">All Devices</h2>
-        </div>
-        {hwError ? (
-          <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-red-400">
-            Failed to load hardware inventory for admin.
+      {/* Admin Forms Section */}
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <section className="space-y-4">
+          <div className="flex items-center gap-2 px-1 border-b border-slate-100 pb-4">
+            <Settings className="h-5 w-5 text-indigo-600" />
+            <h2 className="text-xl font-bold text-slate-800">Inventory Management</h2>
           </div>
-        ) : (
-          <AdminHardwareTable data={hardware || []} isLoading={hwLoading} />
-        )}
-      </section>
+          <AdminForms />
+        </section>
+      </div>
+
+      {/* Hardware Table Section */}
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <section className="space-y-4">
+          <div className="flex items-center justify-between px-1 border-b border-slate-100 pb-4">
+            <div className="flex items-center gap-2">
+              <Package className="h-5 w-5 text-indigo-600" />
+              <h2 className="text-xl font-bold text-slate-800">All Devices</h2>
+            </div>
+          </div>
+          {hwError ? (
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600">
+              Failed to load hardware inventory for admin.
+            </div>
+          ) : (
+            <AdminHardwareTable data={hardware || []} isLoading={hwLoading} />
+          )}
+        </section>
+      </div>
     </div>
   );
 }

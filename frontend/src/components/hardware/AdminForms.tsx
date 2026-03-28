@@ -12,10 +12,10 @@ export const AdminForms = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isStaff, setIsStaff] = useState(false);
-  
+
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-  
+
   const queryClient = useQueryClient();
 
   const addHardwareMutation = useMutation({
@@ -46,36 +46,39 @@ export const AdminForms = () => {
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       {/* Add Hardware Form */}
-      <div className="rounded-2xl border border-white/5 bg-slate-900/50 p-6 shadow-xl backdrop-blur-sm">
-        <h2 className="mb-6 flex items-center gap-2 text-xl font-bold text-white">
-          <Plus className="h-5 w-5 text-indigo-400" />
-          Add New Equipment
-        </h2>
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+            <Plus className="h-5 w-5" />
+          </div>
+          <h2 className="text-lg font-bold text-slate-900">Add New Equipment</h2>
+        </div>
+
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1">Hardware Name</label>
-            <input 
-              type="text" 
-              className="w-full rounded-xl border border-slate-800 bg-slate-950/50 py-2 px-4 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Hardware Name</label>
+            <input
+              type="text"
               placeholder="e.g. MacBook Pro M3"
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
               value={hwName}
               onChange={(e) => setHwName(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1">Brand</label>
-            <input 
-              type="text" 
-              className="w-full rounded-xl border border-slate-800 bg-slate-950/50 py-2 px-4 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Brand</label>
+            <input
+              type="text"
               placeholder="e.g. Apple"
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
               value={hwBrand}
               onChange={(e) => setHwBrand(e.target.value)}
             />
           </div>
-          <button 
+          <button
             onClick={() => addHardwareMutation.mutate({ name: hwName, brand: hwBrand })}
             disabled={!hwName || !hwBrand || addHardwareMutation.isPending}
-            className="w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {addHardwareMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             Add Device
@@ -84,46 +87,49 @@ export const AdminForms = () => {
       </div>
 
       {/* Add User Form */}
-      <div className="rounded-2xl border border-white/5 bg-slate-900/50 p-6 shadow-xl backdrop-blur-sm">
-        <h2 className="mb-6 flex items-center gap-2 text-xl font-bold text-white">
-          <UserPlus className="h-5 w-5 text-emerald-400" />
-          Create User Account
-        </h2>
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+            <UserPlus className="h-5 w-5" />
+          </div>
+          <h2 className="text-lg font-bold text-slate-900">Create User Account</h2>
+        </div>
+
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1">Username</label>
-            <input 
-              type="text" 
-              className="w-full rounded-xl border border-slate-800 bg-slate-950/50 py-2 px-4 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Username</label>
+            <input
+              type="text"
               placeholder="e.g. john.doe"
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1">Password</label>
-            <input 
-              type="password" 
-              className="w-full rounded-xl border border-slate-800 bg-slate-950/50 py-2 px-4 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Password</label>
+            <input
+              type="password"
               placeholder="••••••••"
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-2 py-2">
-            <input 
-              type="checkbox" 
-              id="isStaff" 
-              className="h-4 w-4 rounded border-slate-800 bg-slate-950"
+          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-100 bg-slate-50 p-3 transition-colors hover:bg-slate-100">
+            <input
+              type="checkbox"
+              id="isStaff"
+              className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
               checked={isStaff}
               onChange={(e) => setIsStaff(e.target.checked)}
             />
-            <label htmlFor="isStaff" className="text-sm text-slate-400">Grant Administrator access</label>
-          </div>
-          <button 
+            <span className="text-sm font-semibold text-slate-700">Grant Administrator access</span>
+          </label>
+          <button
             onClick={() => addUserMutation.mutate({ username, password, is_staff: isStaff })}
             disabled={!username || !password || addUserMutation.isPending}
-            className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {addUserMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
             Create User
@@ -131,14 +137,14 @@ export const AdminForms = () => {
         </div>
       </div>
 
-      {/* Unified Feedback Toast (simplified for now) */}
+      {/* Simplified Feedback Toast */}
       {(success || error) && (
         <div className={cn(
-          "fixed bottom-8 right-8 flex items-center gap-3 rounded-2xl p-4 shadow-2xl animate-in slide-in-from-right-8 fade-in duration-300 z-50",
-          success ? "bg-emerald-500 text-white" : "bg-red-500 text-white"
+          "fixed bottom-8 right-8 flex items-center gap-3 rounded-xl p-4 shadow-xl border animate-in slide-in-from-right-8 fade-in duration-300 z-50",
+          success ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-700 border-red-100"
         )}>
           {success ? <CheckCircle2 className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
-          <span className="font-medium">{success || error}</span>
+          <span className="font-semibold text-sm">{success || error}</span>
         </div>
       )}
     </div>

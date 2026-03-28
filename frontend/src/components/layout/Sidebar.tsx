@@ -21,13 +21,13 @@ export const Sidebar = () => {
   }
 
   return (
-    <div className="flex h-screen w-64 flex-col bg-slate-900 text-slate-100 shadow-xl transition-all duration-300">
-      <div className="flex h-16 items-center justify-center border-b border-slate-800 px-4">
-        <LayoutDashboard className="mr-2 text-indigo-400" />
-        <span className="text-xl font-bold tracking-tight">Hardware Manager</span>
+    <div className="flex h-screen w-64 flex-col bg-white border-r border-slate-200 text-slate-900 transition-all duration-300">
+      <div className="flex h-16 items-center justify-center border-b border-slate-100 px-4">
+        <LayoutDashboard className="mr-2 text-indigo-600" />
+        <span className="text-xl font-bold tracking-tight text-slate-900">Hardware Manager</span>
       </div>
 
-      <nav className="mt-6 flex-1 space-y-2 px-4">
+      <nav className="mt-6 flex-1 space-y-1 px-3">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -36,30 +36,32 @@ export const Sidebar = () => {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center rounded-lg px-4 py-3 text-sm font-medium transition-all hover:bg-slate-800 hover:text-white",
-                isActive ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30" : "text-slate-400"
+                "flex items-center rounded-lg px-4 py-2.5 text-sm font-medium transition-all",
+                isActive 
+                  ? "bg-indigo-50 text-indigo-600" 
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               )}
             >
-              <Icon className={cn("mr-3 h-5 w-5", isActive ? "text-white" : "text-slate-500")} />
+              <Icon className={cn("mr-3 h-5 w-5", isActive ? "text-indigo-600" : "text-slate-400")} />
               {item.name}
             </Link>
           );
         })}
       </nav>
 
-      <div className="border-t border-slate-800 p-4">
+      <div className="border-t border-slate-100 p-4">
         <div className="mb-4 flex items-center px-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-bold text-white shadow-inner">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-700">
             {user?.username?.charAt(0).toUpperCase() || 'U'}
           </div>
           <div className="ml-3 overflow-hidden">
-            <p className="truncate text-sm font-medium text-white">{user?.username || 'Guest'}</p>
-            <p className="truncate text-xs text-slate-500">{user?.is_staff ? 'Administrator' : 'User'}</p>
+            <p className="truncate text-sm font-semibold text-slate-900">{user?.username || 'Guest'}</p>
+            <p className="truncate text-xs text-slate-500 uppercase tracking-wider font-medium">{user?.is_staff ? 'Administrator' : 'User'}</p>
           </div>
         </div>
         <button
           onClick={logout}
-          className="flex w-full items-center rounded-lg px-4 py-2 text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-red-400"
+          className="flex w-full items-center rounded-lg px-4 py-2 text-sm font-medium text-slate-500 transition-all hover:bg-red-50 hover:text-red-600"
         >
           <LogOut className="mr-3 h-5 w-5" />
           Logout

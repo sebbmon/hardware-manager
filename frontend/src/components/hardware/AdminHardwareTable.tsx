@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Wrench, 
-  CheckCircle2, 
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Wrench,
+  CheckCircle2,
   XCircle,
   Loader2,
   Trash
@@ -43,47 +43,52 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
 
   return (
     <div className="space-y-6">
-      <div className="overflow-hidden rounded-2xl border border-white/5 bg-slate-900/50 shadow-2xl">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all text-slate-900">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm border-collapse">
-            <thead className="bg-slate-800/50 border-b border-white/5">
+            <thead className="bg-slate-50 border-b border-slate-200 uppercase tracking-wider">
               <tr>
-                <th className="px-6 py-4 font-semibold text-slate-300">Name</th>
-                <th className="px-6 py-4 font-semibold text-slate-300">Brand</th>
-                <th className="px-6 py-4 font-semibold text-slate-300">Status</th>
-                <th className="px-6 py-4 font-semibold text-slate-300 text-right">Actions</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase">Name</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase">Brand</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase">Status</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    <td className="px-6 py-4"><div className="h-4 w-32 rounded bg-slate-800" /></td>
-                    <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-800" /></td>
-                    <td className="px-6 py-4"><div className="h-6 w-20 rounded bg-slate-800" /></td>
-                    <td className="px-6 py-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-slate-800" /></td>
+                    <td className="px-6 py-4"><div className="h-4 w-32 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4"><div className="h-6 w-20 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-slate-100" /></td>
                   </tr>
                 ))
               ) : data.map((item) => (
-                <tr key={item.id} className="hover:bg-white/5 transition-colors group">
-                  <td className="px-6 py-4 font-medium text-slate-100">{item.name}</td>
-                  <td className="px-6 py-4 text-slate-400">{item.brand}</td>
+                <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                  <td className="px-6 py-4 font-semibold text-slate-900">{item.name}</td>
+                  <td className="px-6 py-4 text-slate-600">{item.brand}</td>
                   <td className="px-6 py-4">
-                    <span className={cn(
-                      "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium border",
-                      item.status === 'Available' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                      item.status === 'In Use' ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
-                      "bg-red-500/10 text-red-400 border-red-500/20"
-                    )}>
-                      {item.status}
-                    </span>
+                    {item.status === 'Available' ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-100">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Available
+                      </span>
+                    ) : item.status === 'In Use' ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-100">
+                        <XCircle className="h-3.5 w-3.5" /> Rented
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 border border-red-100">
+                        <Wrench className="h-3.5 w-3.5" /> In Repair
+                      </span>
+                    )}
                   </td>
-                  <td className="px-6 py-4 text-right space-x-2">
+                  <td className="px-6 py-4 text-right space-x-1">
                     <button
                       onClick={() => repairMutation.mutate(item.id)}
                       disabled={item.status === 'Repair' || repairMutation.isPending}
-                      title="Mark as In Repair"
-                      className="p-2 text-slate-400 hover:text-amber-400 hover:bg-amber-400/10 rounded-lg transition-all disabled:opacity-30"
+                      title="Mark for Repair"
+                      className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all disabled:opacity-30"
                     >
                       {repairMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wrench className="h-4 w-4" />}
                     </button>
@@ -91,7 +96,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                       onClick={() => deleteMutation.mutate(item.id)}
                       disabled={deleteMutation.isPending}
                       title="Delete Hardware"
-                      className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                     >
                        {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                     </button>

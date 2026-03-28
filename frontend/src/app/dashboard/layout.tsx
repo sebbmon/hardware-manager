@@ -30,12 +30,9 @@ export default function DashboardLayout({
   if (!user) return null;
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-50 overflow-hidden">
+    <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden">
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-8 relative">
-        {/* Ambient background glow */}
-        <div className="absolute top-0 right-0 w-[30%] h-[30%] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
-        
         <div className="relative z-10 mx-auto max-w-7xl">
           {children}
         </div>
