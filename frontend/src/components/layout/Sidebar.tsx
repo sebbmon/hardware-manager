@@ -58,7 +58,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         </div>
 
         {/* Navigation */}
-        <nav className="mt-3 flex-1 space-y-1 px-3 mb-6 md:mb-0">
+        <nav className="mt-3 flex-1 space-y-1 px-3 mb-3 md:mb-0">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
