@@ -102,17 +102,24 @@ class AdminHardwareViewSet(viewsets.ModelViewSet):
             if not hardware:
                 return Response({'detail': 'Equipment not found.'}, status=status.HTTP_404_NOT_FOUND)
                 
+            # GUARD: cant send an item which is currently in use
             if hardware.status == 'In Use':
-                # Closes active rental related to that hardware
-                rental = Rental.objects.filter(hardware=hardware, is_active=True).first()
-                if rental:
-                    rental.is_active = False
-                    rental.returned_at = timezone.now()
-                    rental.save(update_fields=['is_active', 'returned_at'])
-            
-            # Forces repair status
-            hardware.status = 'Repair'
-            hardware.save(update_fields=['status'])
+                return Response(
+                    {'detail': 'Equipment is currently in use. It must be returned before it can be marked for repair.'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            # TOGGLE OFF: if (in repair -> available)
+            if hardware.status == 'Repair':
+                hardware.status = 'Available'
+                hardware.save(update_fields=['status'])
+                return Response({'detail': 'Equipment is now available.'}, status=status.HTTP_200_OK)
+                
+            # TOGGLE ON: if (available -> in repair)
+            if hardware.status == 'Available':
+                hardware.status = 'Repair'
+                hardware.save(update_fields=['status'])
+                return Response({'detail': 'Equipment marked for repair successfully.'}, status=status.HTTP_200_OK)
             
             return Response({'detail': 'Equipment marked for repair successfully.'}, status=status.HTTP_200_OK)
 

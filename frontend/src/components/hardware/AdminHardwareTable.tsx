@@ -171,9 +171,14 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                     <td className="px-6 py-4 text-right space-x-1">
                       <button
                         onClick={() => repairMutation.mutate(item.id)}
-                        disabled={item.status === 'Repair' || repairMutation.isPending}
-                        title="Mark for Repair"
-                        className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all disabled:opacity-30"
+                        disabled={item.status === 'In Use' || repairMutation.isPending}
+                        title={item.status === 'Repair' ? "Mark as Available" : "Mark for Repair"}
+                        className={cn(
+                          "p-2 rounded-lg transition-all disabled:opacity-30",
+                          item.status === 'Repair' 
+                            ? "text-amber-600 bg-amber-50 hover:bg-amber-100" 
+                            : "text-slate-400 hover:text-amber-600 hover:bg-amber-50"
+                        )}
                       >
                         {repairMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wrench className="h-4 w-4" />}
                       </button>
