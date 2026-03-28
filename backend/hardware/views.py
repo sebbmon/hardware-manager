@@ -120,3 +120,17 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
+
+from rest_framework.views import APIView
+
+class UserMeView(APIView):
+    """
+    Zwraca dane aktualnie zalogowanego użytkownika na podstawie tokenu JWT.
+    Dostępne dla każdego zalogowanego (nie tylko admina).
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)

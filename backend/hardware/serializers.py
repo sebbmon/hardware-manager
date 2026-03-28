@@ -11,7 +11,8 @@ class RentalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rental
-        read_only_fields = ['user', 'rented_at', 'returned_at', 'is_active']
+        fields = '__all__'
+        #read_only_fields = ['user', 'rented_at', 'returned_at', 'is_active']
 
 from django.contrib.auth import get_user_model
 
