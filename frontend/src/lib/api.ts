@@ -13,7 +13,16 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-        // Backend will remove cookies itself we just throw the user to the login screen
+
+        // If token is rejected (401), 
+        // forcing cookies to be deleted
+        try {
+          await axios.post('http://localhost:8000/api/logout/', {}, { withCredentials: true });
+        } catch (e) {
+          // Ignoring logout errors, because we are redirecting anyway
+        }
+
+        // Now, with a clean slate, we redirect the user to login
         window.location.href = '/login';
       }
     }

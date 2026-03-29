@@ -6,9 +6,16 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 User = get_user_model()
 
 class HardwareSerializer(serializers.ModelSerializer):
+    serial_number = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+
     class Meta:
         model = Hardware
         fields = '__all__'
+
+    def validate_serial_number(self, value):
+        if not value or value.strip() == "":
+            return None
+        return value
 
 class RentalSerializer(serializers.ModelSerializer):
     hardware = HardwareSerializer(read_only=True)

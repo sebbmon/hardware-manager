@@ -3,8 +3,6 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.db import transaction
-
-# UWAGA: Zmień 'hardware' na nazwę swojego folderu z aplikacją Django (np. 'api.models' jeśli aplikacja nazywa się 'api')
 from hardware.models import Hardware, Rental 
 
 User = get_user_model()
@@ -30,7 +28,7 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             for item in data:
-                # 1. Parsowanie daty zakupu (obsługa różnych formatów)
+                # 1. parsing purchase date
                 purchase_date_str = item.get('purchaseDate')
                 purchase_date = None
                 if purchase_date_str:
@@ -41,7 +39,7 @@ class Command(BaseCommand):
                         except ValueError:
                             pass
                 
-                # 2. Notes & History (Najpierw łączymy, żeby mieć pełen tekst do analizy)
+                # 2. Notes & History
                 notes = item.get('notes', '').strip()
                 history = item.get('history', '').strip()
                 
@@ -53,7 +51,7 @@ class Command(BaseCommand):
                 
                 final_notes = "\n".join(combined_notes_parts) if combined_notes_parts else None
 
-                # 3. Sanitizacja Danych i Logika Statusu
+                # 3. Data sanitization and status logic
                 brand = item.get('brand')
                 if not brand:  
                     brand = 'Unknown'
@@ -62,25 +60,25 @@ class Command(BaseCommand):
                 
                 status = item.get('status', 'Available')
                 
-                # A. Zabezpieczenie przed całkowicie błędnymi statusami (np. 'Unknown')
+                # A. Protection against completely wrong statuses (e.g. 'Unknown')
                 if status not in valid_statuses:
                     status = 'Repair'
 
-                # B. SKANER SŁÓW KLUCZOWYCH (Wymuszanie statusu Repair mimo JSON-a)
+                # B. KEYWORD SCANNER (Forcing Repair status despite JSON)
                 if final_notes and status == 'Available':
-                    # Lista "czerwonych flag" oznaczających uszkodzenie
+                    # List of "red flags" indicating damage
                     red_flags = ['damage', 'swelling', 'service', 'sticky', 'broken', 'issue', 'liquid']
                     notes_lower = final_notes.lower()
                     
                     if any(flag in notes_lower for flag in red_flags):
                         status = 'Repair'
                 
-                # 4. Logika assignedTo (Nadpisuje na 'In Use', jeśli ktoś posiada sprzęt)
+                # 4. assignedTo logic (overwrites to 'In Use' if someone has the hardware)
                 assigned_to = item.get('assignedTo')
                 if assigned_to:
                     status = 'In Use'
                     
-                # 5. Tworzenie rekordu Hardware (ignorujemy ID z JSON-a)
+                # 5. Creating Hardware record (ignoring ID from JSON)
                 name = item.get('name', 'Unknown Device')
                 hardware = Hardware.objects.create(
                     name=name,
@@ -91,7 +89,7 @@ class Command(BaseCommand):
                 )
                 created_count += 1
                 
-                # 6. Tworzenie Usera i aktywnego wypożyczenia, jeśli sprzęt jest przypisany
+                # 6. Creating User and active rental if hardware is assigned
                 if assigned_to:
                     user, created = User.objects.get_or_create(
                         email=assigned_to

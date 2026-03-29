@@ -9,12 +9,16 @@ import { cn } from '@/lib/utils';
 export const AdminForms = () => {
   const [hwName, setHwName] = useState('');
   const [hwBrand, setHwBrand] = useState('');
+  const [hwSerialNumber, setHwSerialNumber] = useState('');
+  const [hwCategory, setHwCategory] = useState('laptop');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isStaff, setIsStaff] = useState(false);
 
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  // email domain validation
+  const [emailError, setEmailError] = useState('');
 
   const queryClient = useQueryClient();
 
@@ -24,6 +28,8 @@ export const AdminForms = () => {
       queryClient.invalidateQueries({ queryKey: ['hardware'] });
       setHwName('');
       setHwBrand('');
+      setHwSerialNumber('');
+      setHwCategory('laptop');
       setSuccess('Hardware added successfully!');
       setTimeout(() => setSuccess(''), 3000);
     },
@@ -37,11 +43,40 @@ export const AdminForms = () => {
       setEmail('');
       setPassword('');
       setIsStaff(false);
+      setEmailError('');
       setSuccess('User created successfully!');
       setTimeout(() => setSuccess(''), 3000);
     },
     onError: (err: any) => setError(err.response?.data?.detail || 'Failed to create user'),
   });
+
+  // hardware add validation
+  const handleAddHardware = () => {
+    if (!hwSerialNumber || hwSerialNumber.trim() === '') {
+      setError('Serial number is required!');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
+    addHardwareMutation.mutate({
+      name: hwName,
+      brand: hwBrand,
+      serial_number: hwSerialNumber,
+      category: hwCategory
+    });
+  };
+
+  // @booksy required
+  const handleAddUser = () => {
+    setEmailError('');
+
+    if (!email.endsWith('@booksy.com')) {
+      setEmailError('Invalid domain. Please use @booksy.com');
+      return;
+    }
+
+    addUserMutation.mutate({ email, password, is_staff: isStaff });
+  };
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -75,8 +110,32 @@ export const AdminForms = () => {
               onChange={(e) => setHwBrand(e.target.value)}
             />
           </div>
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Serial Number</label>
+            <input
+              type="text"
+              placeholder="e.g. SN123456789"
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-mono"
+              value={hwSerialNumber}
+              onChange={(e) => setHwSerialNumber(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Category</label>
+            <select
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-medium appearance-none"
+              value={hwCategory}
+              onChange={(e) => setHwCategory(e.target.value)}
+            >
+              <option value="laptop">Laptop</option>
+              <option value="mobile">Mobile</option>
+              <option value="tablet">Tablet</option>
+              <option value="monitor">Monitor</option>
+              <option value="accessory">Accessory</option>
+            </select>
+          </div>
           <button
-            onClick={() => addHardwareMutation.mutate({ name: hwName, brand: hwBrand })}
+            onClick={handleAddHardware}
             disabled={!hwName || !hwBrand || addHardwareMutation.isPending}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-[0.98] disabled:opacity-50"
           >
@@ -99,12 +158,25 @@ export const AdminForms = () => {
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Email</label>
             <input
-              type="text"
-              placeholder="e.g. john@example.com"
-              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
+              type="email"
+              placeholder="e.g. john@booksy.com"
+              className={cn(
+                "w-full rounded-lg border bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 transition-all font-medium",
+                emailError
+                  ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                  : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
+              )}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError('');
+              }}
             />
+            {emailError && (
+              <p className="mt-1.5 ml-1 text-xs font-semibold text-red-500">
+                {emailError}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Password</label>
@@ -127,7 +199,7 @@ export const AdminForms = () => {
             <span className="text-sm font-semibold text-slate-700">Grant Administrator access</span>
           </label>
           <button
-            onClick={() => addUserMutation.mutate({ email, password, is_staff: isStaff })}
+            onClick={handleAddUser}
             disabled={!email || !password || addUserMutation.isPending}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-50"
           >

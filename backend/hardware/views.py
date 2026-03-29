@@ -32,12 +32,14 @@ class HardwareViewSet(viewsets.ReadOnlyModelViewSet):
                 return Response({'detail': 'Equipment is not available for rent.'}, status=status.HTTP_400_BAD_REQUEST)
                 
             # Guard: check for blocked words in notes
+            '''
             if hardware.notes:
                 blocked_words = ['swelling', 'damage', 'service']
                 notes_lower = hardware.notes.lower()
                 # Use regex or simple string match to block words
                 if any(word in notes_lower for word in blocked_words):
                     return Response({'detail': 'Equipment requires service and cannot be rented.'}, status=status.HTTP_400_BAD_REQUEST)
+            '''
                     
             # Change status and create rental
             hardware.status = 'In Use'
@@ -95,6 +97,25 @@ class AdminHardwareViewSet(viewsets.ModelViewSet):
     serializer_class = HardwareSerializer
     permission_classes = [permissions.IsAdminUser]
     filterset_fields = ['status', 'brand', 'name']
+
+    def update(self, request, *args, **kwargs):
+        # get hardware from db
+        instance = self.get_object()
+        
+        # check what new status admin is sending in the form
+        new_status = request.data.get('status', instance.status)
+
+        # GUARD: protecting business logic! 
+        # If hardware is in use, and admin tries to change status to Repair
+        if instance.status == 'In Use' and new_status != 'In Use':
+            return Response(
+                {"detail": "Cannot change the status of hardware that is currently rented. User must return it first."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # If hardware is not in use (or admin is not changing the status, but only notes/serial number),
+        # allow DRF to save to db normally
+        return super().update(request, *args, **kwargs)
     
     @action(detail=True, methods=['post'])
     def mark_in_repair(self, request, pk=None):
@@ -198,6 +219,6 @@ class LogoutView(APIView):
 
     def post(self, request):
         response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
-        response.delete_cookie('access_token')
-        response.delete_cookie('refresh_token')
+        response.delete_cookie('access_token', samesite='Lax')
+        response.delete_cookie('refresh_token', samesite='Lax')
         return response

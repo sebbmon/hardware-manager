@@ -3,18 +3,28 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Lock, AtSign as Email, Loader2, AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [domainError, setDomainError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
+    setDomainError('');
+
+    // domain validation
+    if (!email.endsWith('@booksy.com')) {
+      setDomainError('Invalid domain. Please use @booksy.com');
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       await login({ email, password });
@@ -43,27 +53,54 @@ export const LoginForm = () => {
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div className="relative">
-              <Email className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="block w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-50 transition-all outline-none"
-                placeholder="Email address"
-              />
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">
+                Email (company domain only)
+              </label>
+              <div className="relative">
+                <Email className={cn(
+                  "absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors",
+                  domainError ? "text-red-400" : "text-slate-400"
+                )} />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (domainError) setDomainError('');
+                  }}
+                  className={cn(
+                    "block w-full rounded-xl border bg-white py-3 pl-12 pr-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all",
+                    domainError
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-50"
+                      : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-50"
+                  )}
+                  placeholder="john@booksy.com"
+                />
+              </div>
+              {domainError && (
+                <p className="mt-1.5 ml-1 text-xs font-semibold text-red-500">
+                  {domainError}
+                </p>
+              )}
             </div>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-50 transition-all outline-none"
-                placeholder="Password"
-              />
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-50 transition-all"
+                  placeholder="••••••••"
+                />
+              </div>
             </div>
           </div>
 
@@ -82,7 +119,7 @@ export const LoginForm = () => {
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              'Sign in'
+              'Login'
             )}
           </button>
         </form>

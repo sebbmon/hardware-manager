@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// 🛠️ Funkcja pomocnicza do dekodowania JWT bez zewnętrznych bibliotek
+// helper function to decode JWT without external libraries
 function decodeJwt(token: string) {
     try {
-        // Token JWT składa się z 3 części, interesuje nas środkowa (payload)
+        // JWT token consists of 3 parts, we are interested in the middle one (payload)
         const payloadBase64Url = token.split('.')[1];
-        // Naprawiamy format Base64Url na standardowy Base64
+        // fixing base64url format to standard base64
         const base64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
-        // Dekodujemy Base64 do stringa JSON
+        // decoding base64 to json string
         const jsonPayload = decodeURIComponent(
             atob(base64)
                 .split('')
@@ -17,7 +17,7 @@ function decodeJwt(token: string) {
         );
         return JSON.parse(jsonPayload);
     } catch (error) {
-        return null; // Zwraca null, jeśli token jest uszkodzony
+        return null; // returns null if token is corrupted
     }
 }
 
@@ -26,25 +26,25 @@ export function proxy(request: NextRequest) {
 
     const isAuthPage = request.nextUrl.pathname.startsWith('/login');
     const isDashboard = request.nextUrl.pathname.startsWith('/dashboard');
-    // 🔥 Sprawdzamy, czy ktoś pcha się do panelu admina
+    // checking if someone is trying to enter the admin panel
     const isAdminPage = request.nextUrl.pathname.startsWith('/dashboard/admin');
 
-    // 1. Brak ciasteczka -> Wyrzucamy na login
+    // 1. No cookie -> redirect to login
     if (!token && isDashboard) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // 2. Jeśli jest token, sprawdzamy, co w nim siedzi
+    // 2. If there is a token, we check what's inside it
     if (token) {
-        // Zalogowany chce wejść na login -> Wrzucamy do apki
+        // Logged in user wants to enter the login page -> redirect to the app
         if (isAuthPage) {
             return NextResponse.redirect(new URL('/dashboard/list', request.url));
         }
 
-        // 🔥 3. TWARDA BLOKADA ADMINA
+        // 3. HARD BLOCKADE FOR ADMIN
         if (isAdminPage) {
             const payload = decodeJwt(token);
-            // Jeśli token nie ma flagi is_staff = true, bezlitośnie wyrzucamy
+            // If the token doesn't have the is_staff = true flag, we redirect them
             if (!payload || payload.is_staff !== true) {
                 return NextResponse.redirect(new URL('/dashboard/list', request.url));
             }

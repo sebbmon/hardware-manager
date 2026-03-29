@@ -43,12 +43,32 @@ class Hardware(models.Model):
         ('Repair', 'Repair'),
     ]
 
+    CATEGORY_CHOICES = [
+        ('laptop', 'Laptop'),
+        ('mobile', 'Mobile'),
+        ('tablet', 'Tablet'),
+        ('monitor', 'Monitor'),
+        ('accessory', 'Accessory'),
+    ]
+
     name = models.CharField(max_length=255)
     brand = models.CharField(max_length=255, default='Unknown')
     purchase_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Available')
     notes = models.TextField(blank=True, null=True)
     added_at = models.DateTimeField(auto_now_add=True)
+    category = models.CharField(
+        max_length=50, 
+        choices=CATEGORY_CHOICES, 
+        default='laptop'
+    )
+    serial_number = models.CharField(
+        max_length=100, 
+        unique=True, 
+        null=True, 
+        blank=True, 
+        help_text="Unique hardware serial number"
+    )
 
     def __str__(self):
         return f"{self.name} ({self.brand})"

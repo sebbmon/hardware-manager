@@ -23,6 +23,8 @@ interface Hardware {
   brand: string;
   status: 'Available' | 'In Use' | 'Repair';
   added_at: string;
+  serial_number?: string;
+  category?: 'laptop' | 'mobile' | 'tablet' | 'monitor' | 'accessory';
   notes?: string;
 }
 

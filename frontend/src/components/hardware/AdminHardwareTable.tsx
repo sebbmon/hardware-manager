@@ -11,11 +11,13 @@ import {
   Filter,
   ChevronUp,
   ChevronDown,
-  Calendar
+  Calendar,
+  Edit2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import EditHardwareModal from './EditHardwareModal';
 
 interface Hardware {
   id: number;
@@ -23,6 +25,8 @@ interface Hardware {
   brand: string;
   status: 'Available' | 'In Use' | 'Repair';
   added_at: string;
+  serial_number?: string;
+  category?: 'laptop' | 'mobile' | 'tablet' | 'monitor' | 'accessory';
   notes?: string;
 }
 
@@ -35,6 +39,8 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [sortConfig, setSortConfig] = useState<{ key: keyof Hardware, direction: 'asc' | 'desc' } | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedHardware, setSelectedHardware] = useState<Hardware | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -46,6 +52,15 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
   const repairMutation = useMutation({
     mutationFn: (id: number) => api.post(`/admin/hardware/${id}/mark_in_repair/`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['hardware'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<Hardware> }) => 
+      api.patch(`/admin/hardware/${id}/`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hardware'] });
+      setIsEditModalOpen(false);
+    },
   });
 
   const handleSort = (key: keyof Hardware) => {
@@ -121,7 +136,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
           <table className="w-full text-left text-sm border-collapse">
             <thead className="bg-slate-50 border-b border-slate-200 uppercase tracking-wider">
               <tr>
-                {['name', 'brand', 'added_at', 'status'].map((header) => (
+                {['name', 'brand', 'serial_number', 'added_at', 'status'].map((header) => (
                   <th
                     key={header}
                     className="cursor-pointer px-6 py-4 text-[11px] font-bold text-slate-500 hover:text-slate-900 transition-colors group uppercase"
@@ -147,6 +162,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                     <td className="px-6 py-4"><div className="h-4 w-32 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-6 w-20 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-slate-100" /></td>
                   </tr>
@@ -156,6 +172,9 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                   <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-6 py-4 font-semibold text-slate-900">{item.name}</td>
                     <td className="px-6 py-4 text-slate-600">{item.brand}</td>
+                    <td className="px-6 py-4 text-slate-500 font-mono text-xs italic">
+                      {item.serial_number || 'Empty'}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-slate-500 font-medium">
                         <Calendar className="h-3.5 w-3.5" />
@@ -178,6 +197,16 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                       )}
                     </td>
                     <td className="px-6 py-4 text-right space-x-1">
+                      <button
+                        onClick={() => {
+                          setSelectedHardware(item);
+                          setIsEditModalOpen(true);
+                        }}
+                        title="Edit Hardware"
+                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
                       <button
                         onClick={() => repairMutation.mutate(item.id)}
                         disabled={item.status === 'In Use' || repairMutation.isPending}
@@ -204,7 +233,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic font-medium">
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400 italic font-medium">
                     No hardware found matching your criteria.
                   </td>
                 </tr>
@@ -213,6 +242,16 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
           </table>
         </div>
       </div>
+
+      <EditHardwareModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={async (id, data) => {
+          await updateMutation.mutateAsync({ id, data });
+        }}
+        hardware={selectedHardware}
+        isSaving={updateMutation.isPending}
+      />
     </div>
   );
 };
