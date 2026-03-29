@@ -3,7 +3,9 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from hardware.models import Hardware, Rental
+
+# UWAGA: Zmień 'hardware' na nazwę swojego folderu z aplikacją Django (np. 'api.models' jeśli aplikacja nazywa się 'api')
+from hardware.models import Hardware, Rental 
 
 User = get_user_model()
 
@@ -24,18 +26,14 @@ class Command(BaseCommand):
             return
 
         valid_statuses = [choice[0] for choice in Hardware.STATUS_CHOICES]
-        
         created_count = 0
 
         with transaction.atomic():
             for item in data:
-                # 1. Ignore ID from JSON (auto-increment will be used by default)
-                
-                # 2. Parse purchaseDate
+                # 1. Parsowanie daty zakupu (obsługa różnych formatów)
                 purchase_date_str = item.get('purchaseDate')
                 purchase_date = None
                 if purchase_date_str:
-                    # Supported formats: YYYY-MM-DD, DD-MM-YYYY
                     for fmt in ('%Y-%m-%d', '%d-%m-%Y'):
                         try:
                             purchase_date = datetime.strptime(purchase_date_str, fmt).date()
@@ -43,19 +41,7 @@ class Command(BaseCommand):
                         except ValueError:
                             pass
                 
-                # 3. Sanitize Data
-                brand = item.get('brand')
-                if not brand:  # Handles None or empty string ""
-                    brand = 'Unknown'
-                elif brand == 'Appel':
-                    brand = 'Apple'
-                
-                status = item.get('status', 'Available')
-                # Severe errors (e.g. status "Unknown") - fallback to 'Repair'
-                if status not in valid_statuses:
-                    status = 'Repair'
-                
-                # 4. Notes / History
+                # 2. Notes & History (Najpierw łączymy, żeby mieć pełen tekst do analizy)
                 notes = item.get('notes', '').strip()
                 history = item.get('history', '').strip()
                 
@@ -66,13 +52,35 @@ class Command(BaseCommand):
                     combined_notes_parts.append(f"History: {history}")
                 
                 final_notes = "\n".join(combined_notes_parts) if combined_notes_parts else None
+
+                # 3. Sanitizacja Danych i Logika Statusu
+                brand = item.get('brand')
+                if not brand:  
+                    brand = 'Unknown'
+                elif brand == 'Appel':
+                    brand = 'Apple'
                 
-                # 5. assignedTo logic
+                status = item.get('status', 'Available')
+                
+                # A. Zabezpieczenie przed całkowicie błędnymi statusami (np. 'Unknown')
+                if status not in valid_statuses:
+                    status = 'Repair'
+
+                # B. SKANER SŁÓW KLUCZOWYCH (Wymuszanie statusu Repair mimo JSON-a)
+                if final_notes and status == 'Available':
+                    # Lista "czerwonych flag" oznaczających uszkodzenie
+                    red_flags = ['damage', 'swelling', 'service', 'sticky', 'broken', 'issue', 'liquid']
+                    notes_lower = final_notes.lower()
+                    
+                    if any(flag in notes_lower for flag in red_flags):
+                        status = 'Repair'
+                
+                # 4. Logika assignedTo (Nadpisuje na 'In Use', jeśli ktoś posiada sprzęt)
                 assigned_to = item.get('assignedTo')
                 if assigned_to:
-                    status = 'In Use'  # Force status to "In Use"
+                    status = 'In Use'
                     
-                # Create Hardware record
+                # 5. Tworzenie rekordu Hardware (ignorujemy ID z JSON-a)
                 name = item.get('name', 'Unknown Device')
                 hardware = Hardware.objects.create(
                     name=name,
@@ -83,11 +91,10 @@ class Command(BaseCommand):
                 )
                 created_count += 1
                 
-                # Create User and Rental if assignedTo is present
+                # 6. Tworzenie Usera i aktywnego wypożyczenia, jeśli sprzęt jest przypisany
                 if assigned_to:
                     user, created = User.objects.get_or_create(
-                        email=assigned_to,
-                        defaults={'username': assigned_to}
+                        email=assigned_to
                     )
                     
                     Rental.objects.create(
@@ -96,4 +103,4 @@ class Command(BaseCommand):
                         is_active=True
                     )
                     
-        self.stdout.write(self.style.SUCCESS(f'Successfully loaded {created_count} hardware items.'))
+        self.stdout.write(self.style.SUCCESS(f'Successfully loaded {created_count} hardware items. Data sanitized and relations built!'))

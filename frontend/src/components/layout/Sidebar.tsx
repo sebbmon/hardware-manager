@@ -3,12 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  LayoutDashboard,
-  ShoppingCart,
-  ShieldCheck,
-  LogOut,
-  Package
+import { 
+  LayoutDashboard, 
+  ShoppingCart, 
+  ShieldCheck, 
+  LogOut, 
+  Package, 
+  X 
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -34,7 +35,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   return (
     <>
       {/* Mobile Overlay (no blur) */}
-      <div
+      <div 
         className={cn(
           "fixed inset-0 z-40 bg-slate-900/20 transition-opacity duration-300 md:hidden",
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
@@ -85,10 +86,10 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         <div className="border-t border-slate-100 p-4 bg-slate-50/50 md:bg-transparent">
           <div className="mb-4 flex items-center px-4">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200">
-              {user?.username?.charAt(0).toUpperCase() || 'U'}
+              {user?.email?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div className="ml-3 overflow-hidden">
-              <p className="truncate text-sm font-bold text-slate-900">{user?.username || 'Guest'}</p>
+              <p className="truncate text-sm font-bold text-slate-900">{user?.email || 'Guest'}</p>
               <p className="truncate text-[10px] text-slate-500 uppercase tracking-widest font-bold">{user?.is_staff ? 'Administrator' : 'User'}</p>
             </div>
           </div>

@@ -10,7 +10,8 @@ import {
   Search,
   Filter,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Calendar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
@@ -21,6 +22,7 @@ interface Hardware {
   name: string;
   brand: string;
   status: 'Available' | 'In Use' | 'Repair';
+  added_at: string;
   notes?: string;
 }
 
@@ -119,14 +121,14 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
           <table className="w-full text-left text-sm border-collapse">
             <thead className="bg-slate-50 border-b border-slate-200 uppercase tracking-wider">
               <tr>
-                {['name', 'brand', 'status'].map((header) => (
+                {['name', 'brand', 'status', 'added_at'].map((header) => (
                   <th 
                     key={header}
                     className="cursor-pointer px-6 py-4 text-[11px] font-bold text-slate-500 hover:text-slate-900 transition-colors group uppercase"
                     onClick={() => handleSort(header as keyof Hardware)}
                   >
                     <div className="flex items-center gap-2">
-                      {header}
+                      {header.replace('_', ' ')}
                       {sortConfig?.key === header ? (
                         sortConfig.direction === 'asc' ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />
                       ) : (
@@ -145,6 +147,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                     <td className="px-6 py-4"><div className="h-4 w-32 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-6 w-20 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-slate-100" /></td>
                   </tr>
                 ))
@@ -167,6 +170,12 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                           <Wrench className="h-3.5 w-3.5" /> In Repair
                         </span>
                       )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-slate-500 font-medium">
+                        <Calendar className="h-3.5 w-3.5" />
+                        {new Date(item.added_at).toLocaleDateString()}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right space-x-1">
                       <button
@@ -195,7 +204,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-slate-400 italic font-medium">
+                  <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic font-medium">
                     No hardware found matching your criteria.
                   </td>
                 </tr>

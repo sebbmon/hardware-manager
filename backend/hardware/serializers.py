@@ -1,5 +1,8 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from .models import Hardware, Rental
+
+User = get_user_model()
 
 class HardwareSerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,22 +10,17 @@ class HardwareSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RentalSerializer(serializers.ModelSerializer):
-    #hardware_details = HardwareSerializer(source='hardware', read_only=True)
     hardware = HardwareSerializer(read_only=True)
 
     class Meta:
         model = Rental
         fields = '__all__'
-        #read_only_fields = ['user', 'rented_at', 'returned_at', 'is_active']
-
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'is_staff', 'is_active']
+        # Zmieniono 'username' na 'email'
+        fields = ['id', 'email', 'password', 'is_staff', 'is_active']
         extra_kwargs = {
             'password': {'write_only': True}
         }

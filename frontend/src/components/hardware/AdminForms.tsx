@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 export const AdminForms = () => {
   const [hwName, setHwName] = useState('');
   const [hwBrand, setHwBrand] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isStaff, setIsStaff] = useState(false);
 
@@ -34,7 +34,7 @@ export const AdminForms = () => {
     mutationFn: (data: any) => api.post('/admin/users/', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      setUsername('');
+      setEmail('');
       setPassword('');
       setIsStaff(false);
       setSuccess('User created successfully!');
@@ -97,13 +97,13 @@ export const AdminForms = () => {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Username</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Email</label>
             <input
               type="text"
-              placeholder="e.g. john.doe"
+              placeholder="e.g. john@example.com"
               className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div>
@@ -127,8 +127,8 @@ export const AdminForms = () => {
             <span className="text-sm font-semibold text-slate-700">Grant Administrator access</span>
           </label>
           <button
-            onClick={() => addUserMutation.mutate({ username, password, is_staff: isStaff })}
-            disabled={!username || !password || addUserMutation.isPending}
+            onClick={() => addUserMutation.mutate({ email, password, is_staff: isStaff })}
+            disabled={!email || !password || addUserMutation.isPending}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {addUserMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}

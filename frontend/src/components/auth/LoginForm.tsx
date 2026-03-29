@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Lock, User as UserIcon, Loader2, AlertCircle } from 'lucide-react';
+import { Lock, AtSign as Email, Loader2, AlertCircle } from 'lucide-react';
 
 export const LoginForm = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +17,7 @@ export const LoginForm = () => {
     setError('');
 
     try {
-      await login({ username, password });
+      await login({ email, password });
       window.location.href = '/dashboard/list';
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Invalid username or password.');
@@ -44,14 +44,14 @@ export const LoginForm = () => {
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="relative">
-              <UserIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <Email className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
               <input
-                type="text"
+                type="email"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="block w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-50 transition-all outline-none"
-                placeholder="Username"
+                placeholder="Email address"
               />
             </div>
             <div className="relative">
