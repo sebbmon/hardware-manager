@@ -7,6 +7,7 @@ interface User {
   id: number;
   email: string;
   is_staff: boolean;
+  is_active?: boolean;
 }
 
 interface AuthContextType {
@@ -25,14 +26,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // FETCH CURRENT USER
   const fetchUser = async () => {
     try {
+      // Cookie is sent automatically thanks to withCredentials: true
       const response = await api.get('/users/me/');
       setUser(response.data);
       return response.data;
     } catch (err) {
       setUser(null);
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      delete api.defaults.headers.common.Authorization;
       return null;
     } finally {
       setLoading(false);
@@ -41,43 +40,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // INIT AUTH ON APP START
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-
-    if (token) {
-      api.defaults.headers.common.Authorization = `Bearer ${token}`;
-      fetchUser();
-    } else {
-      setLoading(false);
-    }
+    // We just try to get the user if they have a valid cookie, it will work.
+    fetchUser();
   }, []);
 
   // LOGIN
   const login = async (credentials: any): Promise<boolean> => {
     try {
-      // JWT TOKEN
-      const response = await api.post('/token/', credentials);
-      const { access, refresh } = response.data;
+      // 1. We send the login data. Backend sets httpOnly cookies.
+      await api.post('/token/', credentials);
 
-      if (!access) return false;
-
-      // SAVE TOKENS
-      localStorage.setItem('access_token', access);
-      localStorage.setItem('refresh_token', refresh);
-
-      // HEADER FOR AXIOS INSTANCE
-      api.defaults.headers.common.Authorization = `Bearer ${access}`;
-
-      // FETCH USER DATA
+      // 2. Since the cookie is already in the browser, we get the user data
       const userData = await fetchUser();
 
-      // TEMPORARY FOR DEBUGGING
       if (!userData) {
-        throw new Error('Logowanie udane, ale wystąpił problem z pobraniem profilu użytkownika.');
+        throw new Error('Login successful, but there was a problem fetching the profile.');
       }
 
       return true;
     } catch (error: any) {
-      // LOGIN FORM HANDLING
       if (error instanceof Error && !error.message.includes('status code')) {
         throw { response: { data: { detail: error.message } } };
       }
@@ -86,14 +67,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // LOGOUT
-  const logout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-
-    delete api.defaults.headers.common.Authorization;
-
-    setUser(null);
-    window.location.href = '/login';
+  const logout = async () => {
+    try {
+      // We call the new endpoint so the backend deletes the cookies
+      await api.post('/logout/');
+    } catch (error) {
+      console.error("Error during logout", error);
+    } finally {
+      setUser(null);
+      window.location.href = '/login';
+    }
   };
 
   return (

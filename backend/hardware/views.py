@@ -8,6 +8,7 @@ from .serializers import HardwareSerializer, RentalSerializer
 import re
 #NOT FOR PRODUCTION
 from rest_framework.permissions import AllowAny
+from .serializers import CustomTokenObtainPairSerializer
 
 class HardwareViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Hardware.objects.all()
@@ -132,8 +133,8 @@ from rest_framework.views import APIView
 
 class UserMeView(APIView):
     """
-    Zwraca dane aktualnie zalogowanego użytkownika na podstawie tokenu JWT.
-    Dostępne dla każdego zalogowanego (nie tylko admina).
+    Returns the data of the currently logged-in user based on the JWT token.
+    Available to any logged-in user (not just admins).
     """
     permission_classes = [permissions.IsAuthenticated]
 
@@ -141,3 +142,62 @@ class UserMeView(APIView):
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.conf import settings
+
+
+# 2. Custom Login View
+class CookieTokenObtainPairView(TokenObtainPairView):
+    """
+    Nadpisuje domyślne logowanie, tak aby tokeny były zapisywane 
+    w bezpiecznych ciasteczkach (httpOnly).
+    """
+    serializer_class = CustomTokenObtainPairSerializer
+    
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        
+        if response.status_code == 200:
+            access_token = response.data.get('access')
+            refresh_token = response.data.get('refresh')
+
+            # set cookie access token
+            response.set_cookie(
+                'access_token',
+                access_token,
+                max_age=24 * 60 * 60,  # 1 day (according to SIMPLE_JWT)
+                httponly=True,
+                samesite='Lax',
+                secure=False, # Change to True in production (requires HTTPS)
+            )
+            
+            # set cookie refresh token
+            response.set_cookie(
+                'refresh_token',
+                refresh_token,
+                max_age=7 * 24 * 60 * 60, # 7 days
+                httponly=True,
+                samesite='Lax',
+                secure=False,
+            )
+            
+            # Security: We remove tokens from the JSON body
+            del response.data['access']
+            del response.data['refresh']
+            response.data['detail'] = 'Successfully logged in.'
+
+        return response
+
+# 3. Custom Logout View
+class LogoutView(APIView):
+    """
+    Deletes cookies during logout.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+        return response

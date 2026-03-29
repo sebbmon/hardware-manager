@@ -30,7 +30,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    objects = CustomUserManager() # 🔥 DODAJ TĘ LINIJKĘ (przypisuje naszego nowego menedżera)
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.email
@@ -55,7 +55,6 @@ class Hardware(models.Model):
 
 # 3. Rental Model
 class Rental(models.Model):
-    # Używamy settings.AUTH_USER_MODEL jako najlepszej praktyki dla Custom User Model
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='rentals')
     hardware = models.ForeignKey(Hardware, on_delete=models.CASCADE, related_name='rentals')
     rented_at = models.DateTimeField(auto_now_add=True)
