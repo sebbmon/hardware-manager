@@ -120,10 +120,10 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-slate-400" />
-          <select 
+          <select
             className="rounded-lg border border-slate-200 bg-white py-2 px-4 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none transition-all shadow-sm"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -141,8 +141,8 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
           <table className="w-full text-left text-sm border-collapse">
             <thead className="bg-slate-50 border-b border-slate-200 uppercase tracking-wider">
               <tr>
-                {['name', 'brand', 'status', 'added_at'].map((header) => (
-                  <th 
+                {['name', 'brand', 'added_at', 'status'].map((header) => (
+                  <th
                     key={header}
                     className="cursor-pointer px-6 py-4 text-[11px] font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase"
                     onClick={() => handleSort(header as keyof Hardware)}
@@ -166,8 +166,8 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
                   <tr key={i} className="animate-pulse">
                     <td className="px-6 py-4"><div className="h-4 w-32 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
-                    <td className="px-6 py-4"><div className="h-6 w-20 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4"><div className="h-6 w-20 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-8 w-24 rounded bg-slate-100" /></td>
                   </tr>
                 ))
@@ -176,21 +176,21 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
                   <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-6 py-4 font-semibold text-slate-900">{item.name}</td>
                     <td className="px-6 py-4 text-slate-600">{item.brand}</td>
-                    <td className="px-6 py-4">{getStatusBadge(item.status)}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-slate-500 font-medium">
                         <Calendar className="h-3.5 w-3.5" />
                         {new Date(item.added_at).toLocaleDateString()}
                       </div>
                     </td>
+                    <td className="px-6 py-4">{getStatusBadge(item.status)}</td>
                     <td className="px-6 py-4">
                       <button
                         onClick={() => rentMutation.mutate(item.id)}
                         disabled={item.status !== 'Available' || rentMutation.isPending}
                         className={cn(
                           "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all focus:outline-none focus:ring-2 active:scale-[0.98]",
-                          item.status === 'Available' 
-                            ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-100 ring-indigo-500/20" 
+                          item.status === 'Available'
+                            ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-100 ring-indigo-500/20"
                             : "bg-slate-100 text-slate-400 cursor-not-allowed"
                         )}
                       >
