@@ -70,7 +70,7 @@ const EditHardwareModal = ({ isOpen, onClose, onSave, hardware, isSaving }: Edit
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-hidden">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-opacity duration-300"
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity duration-300"
         onClick={onClose}
       />
 

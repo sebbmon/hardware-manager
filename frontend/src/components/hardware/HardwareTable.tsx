@@ -140,7 +140,7 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all text-slate-900">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm border-collapse">
+          <table className="w-full text-left text-sm border-collapse table-fixed">
             <thead className="bg-slate-50 border-b border-slate-200 uppercase tracking-wider">
               <tr>
                 {['name', 'brand', 'added_at', 'status'].map((header) => (

@@ -30,7 +30,17 @@ export const LoginForm = () => {
       await login({ email, password });
       window.location.href = '/dashboard/list';
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Invalid username or password.');
+      // Wyciągamy dane z odpowiedzi
+      const errorData = err.response?.data;
+
+      // Szukamy błędu w "detail", w "non_field_errors", albo w "email"
+      const errorMessage =
+        errorData?.detail ||
+        (errorData?.non_field_errors && errorData.non_field_errors[0]) ||
+        (errorData?.email && errorData.email[0]) ||
+        'Invalid username or password.';
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

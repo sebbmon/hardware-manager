@@ -20,23 +20,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from hardware.views import CookieTokenObtainPairView, LogoutView 
 from rest_framework_simplejwt.views import TokenRefreshView
 
-'''
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/', include('hardware.urls')),
-]
-'''
-
-urlpatterns = [
-    # 1. Main Django admin panel (http://localhost:8000/admin/)
+    # 1. Main Django admin panel
     path('admin/', admin.site.urls),
     
-    # 2. This connects your original file with the hardware and rental API!
+    # 2. This connects original file with the hardware and rental API
     path('api/', include('hardware.urls')), 
     
-    # 3. UPDATED LOGIN ENDPOINTS (with cookies):
+    # 3. UPDATED LOGIN ENDPOINTS with cookies
     path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/logout/', LogoutView.as_view(), name='logout'),

@@ -55,7 +55,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<Hardware> }) => 
+    mutationFn: ({ id, data }: { id: number; data: Partial<Hardware> }) =>
       api.patch(`/admin/hardware/${id}/`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hardware'] });
@@ -133,7 +133,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all text-slate-900">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm border-collapse">
+          <table className="w-full text-left text-sm border-collapse table-fixed">
             <thead className="bg-slate-50 border-b border-slate-200 uppercase tracking-wider">
               <tr>
                 {['name', 'brand', 'serial_number', 'added_at', 'status'].map((header) => (
@@ -172,7 +172,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                   <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-6 py-4 font-semibold text-slate-900">{item.name}</td>
                     <td className="px-6 py-4 text-slate-600">{item.brand}</td>
-                    <td className="px-6 py-4 text-slate-500 font-mono text-xs italic">
+                    <td className="px-6 py-4 text-slate-600">
                       {item.serial_number || 'Empty'}
                     </td>
                     <td className="px-6 py-4">

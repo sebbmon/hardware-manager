@@ -17,7 +17,7 @@ export default function AdminPage() {
   if (!loading && !user?.is_staff) {
     redirect('/dashboard/list');
   }
-    */
+  */
 
   return (
     <div className="space-y-12 pb-24">

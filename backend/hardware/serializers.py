@@ -31,6 +31,11 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
+    def validate_email(self, value):
+        if not value.endswith('@booksy.com'):
+            raise serializers.ValidationError("Invalid domain. Please use @booksy.com")
+        return value
     
     def create(self, validated_data):
         password = validated_data.pop('password', None)
@@ -41,6 +46,13 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        email = attrs.get('email', '')
+        if not email.endswith('@booksy.com'):
+            raise serializers.ValidationError("Invalid domain. Please use @booksy.com")
+            
+        return super().validate(attrs)
+
     @classmethod
     def get_token(cls, user):
         # Get default token (with ID and expiration date)
