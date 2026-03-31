@@ -117,6 +117,20 @@ class AdminHardwareViewSet(viewsets.ModelViewSet):
         # If hardware is not in use (or admin is not changing the status, but only notes/serial number),
         # allow DRF to save to db normally
         return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        # get hardware from db
+        instance = self.get_object()
+        
+        # GUARD: cant delete rented hardware
+        if instance.status == 'In Use':
+            return Response(
+                {"detail": "Cannot delete equipment that is currently rented. It must be returned first."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # If hardware is 'Available' or 'Repair', allow deletion
+        return super().destroy(request, *args, **kwargs)
     
     @action(detail=True, methods=['post'])
     def mark_in_repair(self, request, pk=None):

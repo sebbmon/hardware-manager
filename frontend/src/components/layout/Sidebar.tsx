@@ -84,8 +84,8 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
         {/* User Profile & Logout */}
         <div className="border-t border-slate-100 p-4 bg-slate-50/50 md:bg-transparent">
-          <div className="mb-4 flex items-center px-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200">
+          <div className="mb-4 flex items-center px-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full text-slate-100 text-xs font-bold bg-slate-700 border border-slate-200">
               {user?.email?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div className="ml-3 overflow-hidden">
@@ -95,7 +95,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           </div>
           <button
             onClick={logout}
-            className="flex w-full items-center rounded-lg px-4 py-2 text-sm font-medium text-slate-500 transition-all outline-none hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600"
+            className="flex w-full items-center rounded-lg px-4 py-2.5 text-sm font-medium text-slate-500 transition-all outline-none hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600"
           >
             <LogOut className="mr-3 h-5 w-5" />
             Logout

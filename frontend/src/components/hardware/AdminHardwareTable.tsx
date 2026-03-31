@@ -222,9 +222,9 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                       </button>
                       <button
                         onClick={() => deleteMutation.mutate(item.id)}
-                        disabled={deleteMutation.isPending}
-                        title="Delete Hardware"
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        disabled={item.status === 'In Use' || deleteMutation.isPending}
+                        title={item.status === 'In Use' ? "Cannot delete rented hardware" : "Delete Hardware"}
+                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all disabled:opacity-30"
                       >
                         {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                       </button>
