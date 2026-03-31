@@ -203,7 +203,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                 access_token,
                 max_age=24 * 60 * 60,  # 1 day (according to SIMPLE_JWT)
                 httponly=True,
-                samesite='None',
+                samesite='Lax',
                 secure=True, # Change to True in production (requires HTTPS)
             )
             
@@ -213,7 +213,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                 refresh_token,
                 max_age=7 * 24 * 60 * 60, # 7 days
                 httponly=True,
-                samesite='None',
+                samesite='Lax',
                 secure=True,
             )
             
