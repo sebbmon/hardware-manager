@@ -141,7 +141,7 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
   return (
     <div className="space-y-6 text-slate-900">
       {/* Intelligent Search Block */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-[2px]">
         <div className="relative rounded-[14px] bg-white p-5 sm:p-6 shadow-xl">
           <div className="flex flex-col lg:flex-row lg:items-center gap-4">
             <div className="flex-1 space-y-2">

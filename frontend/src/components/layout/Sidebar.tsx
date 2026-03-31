@@ -3,13 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  ShieldCheck, 
-  LogOut, 
-  Package, 
-  X 
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  ShieldCheck,
+  LogOut,
+  Package,
+  X
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -35,7 +35,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   return (
     <>
       {/* Mobile Overlay (no blur) */}
-      <div 
+      <div
         className={cn(
           "fixed inset-0 z-40 bg-slate-900/20 transition-opacity duration-300 md:hidden",
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"

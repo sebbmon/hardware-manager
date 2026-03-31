@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 // helper function to decode JWT without external libraries
 function decodeJwt(token: string) {
     try {
-        // JWT token consists of 3 parts, we are interested in the middle one (payload)
+        // JWT token consists of 3 parts we need the middle one (payload)
         const payloadBase64Url = token.split('.')[1];
         // fixing base64url format to standard base64
         const base64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -22,19 +22,35 @@ function decodeJwt(token: string) {
 }
 
 export function proxy(request: NextRequest) {
-    const token = request.cookies.get('access_token')?.value;
+    let token = request.cookies.get('access_token')?.value;
 
     const isAuthPage = request.nextUrl.pathname.startsWith('/login');
     const isDashboard = request.nextUrl.pathname.startsWith('/dashboard');
     // checking if someone is trying to enter the admin panel
     const isAdminPage = request.nextUrl.pathname.startsWith('/dashboard/admin');
 
-    // 1. No cookie -> redirect to login
-    if (!token && isDashboard) {
-        return NextResponse.redirect(new URL('/login', request.url));
+    // Verification of token expiration date at the middleware level (prevents 307 loop)
+    if (token) {
+        const payload = decodeJwt(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // If the payload is invalid or the token has expired
+        if (!payload || (payload.exp && payload.exp < currentTime)) {
+            // Nullifying the token makes it bypass authed checks and clears loops
+            token = undefined;
+        }
     }
 
-    // 2. If there is a token, we check what's inside it
+    // 1. No valid cookie -> redirect to login (and force cleanup)
+    if (!token && isDashboard) {
+        const response = NextResponse.redirect(new URL('/login', request.url));
+        // Force cleanup of dirty cookies
+        response.cookies.delete('access_token');
+        response.cookies.delete('refresh_token');
+        return response;
+    }
+
+    // 2. If there is a valid token we check whats inside it
     if (token) {
         // Logged in user wants to enter the login page -> redirect to the app
         if (isAuthPage) {
@@ -49,6 +65,14 @@ export function proxy(request: NextRequest) {
                 return NextResponse.redirect(new URL('/dashboard/list', request.url));
             }
         }
+    }
+
+    // Entering login form without a valid token -> clear potentially broken cookies beforehand
+    if (!token && isAuthPage) {
+        const response = NextResponse.next();
+        response.cookies.delete('access_token');
+        response.cookies.delete('refresh_token');
+        return response;
     }
 
     return NextResponse.next();

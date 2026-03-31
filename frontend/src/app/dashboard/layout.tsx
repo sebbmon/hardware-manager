@@ -35,9 +35,9 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden relative">
       {/* Sidebar Component with mobile logic */}
-      <Sidebar 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       {/* Main Content Area */}
@@ -48,7 +48,7 @@ export default function DashboardLayout({
             <LayoutDashboard className="mr-2 text-indigo-600" />
             <span className="text-xl font-bold font-black tracking-tight text-slate-900">Hardware Hub</span>
           </div>
-          <button 
+          <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className={cn(
               "rounded-md p-1.5 transition-all outline-none",

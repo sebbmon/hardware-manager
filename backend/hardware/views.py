@@ -1,5 +1,6 @@
 import json
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
@@ -230,41 +231,47 @@ def semantic_search(request):
     Takes a natural language query, asks Gemini to find matching hardware IDs,
     and returns the filtered hardware list.
     """
-    genai.configure(api_key=settings.GEMINI_API_KEY)
+    # initializing the client
+    client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
     user_query = request.data.get('query')
     if not user_query:
         return Response({"error": "Please provide a search query!"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Fetch basic data including status so AI knows what is available
+    # fetch basic data including status so AI knows what is available
     hardware_list = list(Hardware.objects.all().values('id', 'name', 'brand', 'status'))
     
-    # Crafting the prompt
+    # crafting the prompt
     prompt = f"""
     You are an IT assistant in an equipment rental system. 
     The user is asking for: "{user_query}".
     Here is our hardware database: {json.dumps(hardware_list)}.
     Return ONLY and EXCLUSIVELY a JSON array with the ID numbers of the equipment that best matches the query. 
     Take into account the 'status' field. If the user wants to rent something, prioritize 'Available' devices.
-    Do not write any other text, greetings, or markdown formatting. Return example: [1, 4, 7]
     """
 
     try:
-        # Ask the model
-        model = genai.GenerativeModel('gemini-2.5-flash-lite')
-        response = model.generate_content(prompt)
+        # calling the model through the client object
+        response = client.models.generate_content(
+            model='gemini-2.5-flash-lite',
+            contents=prompt,
+            # forcing the model to return a pure json
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+            )
+        )
         
-        # clean the response and parse it into a list
-        cleaned_text = response.text.strip().replace('```json', '').replace('```', '').strip()
-        matched_ids = json.loads(cleaned_text)
+        # forced application/json -> response.text is ready to parse
+        matched_ids = json.loads(response.text)
 
-        # fetch full objects from the DB based on AI-selected IDs
+        # fetching full objects from the DB based on the selected IDs
         results = Hardware.objects.filter(id__in=matched_ids)
         serializer = HardwareSerializer(results, many=True)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
         
     except json.JSONDecodeError:
-        return Response({"error": "AI returned an invalid format."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"error": "AI returned an invalid format. Try again."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except Exception as e:
-        return Response({"error": "AI service is currently unavailable."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # added str(e) for debugging
+        return Response({"error": "AI service is currently unavailable.", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
