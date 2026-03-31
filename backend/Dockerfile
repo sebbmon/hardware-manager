@@ -16,4 +16,4 @@ COPY . .
 # collect static files
 RUN python manage.py collectstatic --noinput
 
-CMD python manage.py migrate && python manage.py load_seed_data seed_data.json && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+CMD sh -c "python manage.py migrate && python manage.py createsuperuser --noinput || true && gunicorn config.wsgi --bind 0.0.0.0:8000"
