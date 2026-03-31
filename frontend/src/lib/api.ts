@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/';
+
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/',
+  baseURL: baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -17,7 +19,7 @@ api.interceptors.response.use(
         // If token is rejected (401), 
         // forcing cookies to be deleted
         try {
-          await axios.post('http://localhost:8000/api/logout/', {}, { withCredentials: true });
+          await axios.post(`${baseURL}logout/`, {}, { withCredentials: true });
         } catch (e) {
           // Ignoring logout errors, because we are redirecting anyway
         }
