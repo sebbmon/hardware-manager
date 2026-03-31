@@ -203,8 +203,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                 access_token,
                 max_age=24 * 60 * 60,  # 1 day (according to SIMPLE_JWT)
                 httponly=True,
-                samesite='Lax',
-                secure=False, # Change to True in production (requires HTTPS)
+                samesite='None',
+                secure=True, # Change to True in production (requires HTTPS)
             )
             
             # set cookie refresh token
@@ -213,8 +213,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                 refresh_token,
                 max_age=7 * 24 * 60 * 60, # 7 days
                 httponly=True,
-                samesite='Lax',
-                secure=False,
+                samesite='None',
+                secure=True,
             )
             
             # Security: We remove tokens from the JSON body
