@@ -1,19 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
   allowedDevOrigins: ['127.0.0.1'],
 
-  trailingSlash: true,
-
   async rewrites() {
+    // Rozpoznajemy środowisko
+    const isDev = process.env.NODE_ENV === 'development';
+    const baseUrl = isDev
+      ? 'http://127.0.0.1:8000'
+      : 'https://hardware-hub-mondel.onrender.com';
+
     return [
       {
         source: '/api/:path*',
-        destination: process.env.NODE_ENV === 'development'
-          ? 'http://127.0.0.1:8000/api/:path*'
-          : 'https://hardware-hub-mondel.onrender.com/api/:path*',
+        destination: `${baseUrl}/api/:path*/`,
       },
     ];
   },
