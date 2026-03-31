@@ -13,11 +13,9 @@ export default function AdminPage() {
   const { data: hardware, isLoading: hwLoading, error: hwError } = useHardware();
 
   // Guard: Admin only
-  /*
   if (!loading && !user?.is_staff) {
     redirect('/dashboard/list');
   }
-  */
 
   return (
     <div className="space-y-12 pb-24">

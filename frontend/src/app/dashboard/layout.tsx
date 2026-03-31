@@ -60,7 +60,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Scrollable Children */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 relative">
+        <main className="flex-1 overflow-y-scroll p-4 md:p-8 relative">
           <div className="relative z-10 mx-auto max-w-7xl">
             {children}
           </div>

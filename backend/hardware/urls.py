@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import HardwareViewSet, RentalViewSet, AdminHardwareViewSet, AdminUserViewSet, UserMeView
+from .views import HardwareViewSet, RentalViewSet, AdminHardwareViewSet, AdminUserViewSet, UserMeView, semantic_search
 
 router = DefaultRouter()
 router.register(r'hardware', HardwareViewSet, basename='hardware')
@@ -11,6 +11,7 @@ admin_router.register(r'hardware', AdminHardwareViewSet, basename='admin-hardwar
 admin_router.register(r'users', AdminUserViewSet, basename='admin-users')
 
 urlpatterns = [
+    path('hardware/semantic-search/', semantic_search, name='semantic-search'),
     path('users/me/', UserMeView.as_view(), name='user-me'),
     path('', include(router.urls)),
     path('admin/', include(admin_router.urls)),

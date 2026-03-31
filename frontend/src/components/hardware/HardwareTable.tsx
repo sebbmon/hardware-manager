@@ -11,7 +11,9 @@ import {
   XCircle,
   Wrench,
   Loader2,
-  Calendar
+  Calendar,
+  Sparkles,
+  Bot
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
@@ -38,6 +40,11 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [sortConfig, setSortConfig] = useState<{ key: keyof Hardware, direction: 'asc' | 'desc' } | null>(null);
 
+  const [aiQuery, setAiQuery] = useState('');
+  const [aiResults, setAiResults] = useState<Hardware[] | null>(null);
+  const [isAiSearching, setIsAiSearching] = useState(false);
+  const [aiError, setAiError] = useState('');
+
   const queryClient = useQueryClient();
 
   const rentMutation = useMutation({
@@ -56,8 +63,30 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
     setSortConfig({ key, direction });
   };
 
+  const handleSemanticSearch = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!aiQuery.trim()) {
+      setAiResults(null);
+      return;
+    }
+
+    setIsAiSearching(true);
+    setAiError('');
+
+    try {
+      const response = await api.post('/hardware/semantic-search/', { query: aiQuery });
+      setAiResults(response.data);
+      setSearchTerm('');
+      setStatusFilter('All');
+    } catch (err) {
+      setAiError('Failed to perform intelligent search. Please try again.');
+    } finally {
+      setIsAiSearching(false);
+    }
+  };
+
   const filteredAndSortedData = React.useMemo(() => {
-    let result = [...data];
+    let result = aiResults !== null ? [...aiResults] : [...data];
 
     // Filter
     if (searchTerm) {
@@ -84,7 +113,7 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
     }
 
     return result;
-  }, [data, searchTerm, statusFilter, sortConfig]);
+  }, [data, searchTerm, statusFilter, sortConfig, aiResults]);
 
   const getStatusBadge = (status: Hardware['status']) => {
     switch (status) {
@@ -111,6 +140,61 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
 
   return (
     <div className="space-y-6 text-slate-900">
+      {/* Intelligent Search Block */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1">
+        <div className="relative rounded-[14px] bg-white p-5 sm:p-6 shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+            <div className="flex-1 space-y-2">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-indigo-500" />
+                Intelligent Search
+              </h3>
+              <p className="text-sm text-slate-500 font-medium">
+                Describe the equipment you need in natural language, and AI will find the best match for your task!
+              </p>
+            </div>
+            <form onSubmit={handleSemanticSearch} className="flex-[1.5] w-full relative">
+              <input
+                type="text"
+                placeholder="e.g. I need a laptop for heavy video editing..."
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-4 pr-32 text-sm text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium"
+                value={aiQuery}
+                onChange={(e) => setAiQuery(e.target.value)}
+                disabled={isAiSearching}
+              />
+              <button
+                type="submit"
+                disabled={isAiSearching || !aiQuery.trim()}
+                className="absolute right-1.5 top-1.5 bottom-1.5 rounded-lg bg-indigo-600 px-4 text-xs font-bold text-white shadow-md shadow-indigo-200 hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isAiSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+                Ask AI
+              </button>
+            </form>
+          </div>
+          {aiError && (
+            <p className="mt-3 text-sm text-red-500 font-medium flex items-center gap-1.5">
+              <XCircle className="h-4 w-4" /> {aiError}
+            </p>
+          )}
+          {aiResults !== null && (
+            <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+              <span className="text-sm font-bold text-indigo-600">
+                Found {aiResults.length} result(s) based on your request.
+              </span>
+              <button
+                type="button"
+                onClick={() => { setAiResults(null); setAiQuery(''); }}
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors"
+                disabled={isAiSearching}
+              >
+                Clear AI Results
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-sm flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />

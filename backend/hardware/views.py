@@ -1,14 +1,17 @@
+import json
+import google.generativeai as genai
 from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.db import transaction
 from django.utils import timezone
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from .models import Hardware, Rental
-from .serializers import HardwareSerializer, RentalSerializer
+from .serializers import HardwareSerializer, RentalSerializer, UserSerializer, CustomTokenObtainPairSerializer
 import re
 #NOT FOR PRODUCTION
 from rest_framework.permissions import AllowAny
-from .serializers import CustomTokenObtainPairSerializer
 
 class HardwareViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Hardware.objects.all()
@@ -86,9 +89,6 @@ class RentalViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         # "My rentals": active rentals for logged in user
         return Rental.objects.filter(user=self.request.user, is_active=True)
-
-from django.contrib.auth import get_user_model
-from .serializers import UserSerializer
 
 User = get_user_model()
 
@@ -171,8 +171,7 @@ from django.conf import settings
 # 2. Custom Login View
 class CookieTokenObtainPairView(TokenObtainPairView):
     """
-    Nadpisuje domyślne logowanie, tak aby tokeny były zapisywane 
-    w bezpiecznych ciasteczkach (httpOnly).
+    Overwrites default login, so that tokens are saved in secure cookies (httpOnly)
     """
     serializer_class = CustomTokenObtainPairSerializer
     
@@ -222,3 +221,50 @@ class LogoutView(APIView):
         response.delete_cookie('access_token', samesite='Lax')
         response.delete_cookie('refresh_token', samesite='Lax')
         return response
+
+# SEMANTIC SEARCH
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def semantic_search(request):
+    """
+    Takes a natural language query, asks Gemini to find matching hardware IDs,
+    and returns the filtered hardware list.
+    """
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+
+    user_query = request.data.get('query')
+    if not user_query:
+        return Response({"error": "Please provide a search query!"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Fetch basic data including status so AI knows what is available
+    hardware_list = list(Hardware.objects.all().values('id', 'name', 'brand', 'status'))
+    
+    # Crafting the prompt
+    prompt = f"""
+    You are an IT assistant in an equipment rental system. 
+    The user is asking for: "{user_query}".
+    Here is our hardware database: {json.dumps(hardware_list)}.
+    Return ONLY and EXCLUSIVELY a JSON array with the ID numbers of the equipment that best matches the query. 
+    Take into account the 'status' field. If the user wants to rent something, prioritize 'Available' devices.
+    Do not write any other text, greetings, or markdown formatting. Return example: [1, 4, 7]
+    """
+
+    try:
+        # Ask the model
+        model = genai.GenerativeModel('gemini-2.5-flash-lite')
+        response = model.generate_content(prompt)
+        
+        # clean the response and parse it into a list
+        cleaned_text = response.text.strip().replace('```json', '').replace('```', '').strip()
+        matched_ids = json.loads(cleaned_text)
+
+        # fetch full objects from the DB based on AI-selected IDs
+        results = Hardware.objects.filter(id__in=matched_ids)
+        serializer = HardwareSerializer(results, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    except json.JSONDecodeError:
+        return Response({"error": "AI returned an invalid format."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        return Response({"error": "AI service is currently unavailable."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
