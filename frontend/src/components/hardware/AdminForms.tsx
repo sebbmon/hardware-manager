@@ -23,7 +23,7 @@ export const AdminForms = () => {
   const queryClient = useQueryClient();
 
   const addHardwareMutation = useMutation({
-    mutationFn: (data: any) => api.post('/admin/hardware/', data),
+    mutationFn: (data: any) => api.post('/admin/hardware', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hardware'] });
       setHwName('');
@@ -37,7 +37,7 @@ export const AdminForms = () => {
   });
 
   const addUserMutation = useMutation({
-    mutationFn: (data: any) => api.post('/admin/users/', data),
+    mutationFn: (data: any) => api.post('/admin/users', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       setEmail('');

@@ -48,7 +48,7 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
   const queryClient = useQueryClient();
 
   const rentMutation = useMutation({
-    mutationFn: (id: number) => api.post(`/hardware/${id}/rent/`),
+    mutationFn: (id: number) => api.post(`/hardware/${id}/rent`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hardware'] });
       queryClient.invalidateQueries({ queryKey: ['my-rentals'] });
@@ -74,7 +74,7 @@ export const HardwareTable = ({ data, isLoading }: HardwareTableProps) => {
     setAiError('');
 
     try {
-      const response = await api.post('/hardware/semantic-search/', { query: aiQuery });
+      const response = await api.post('/hardware/semantic-search', { query: aiQuery });
       setAiResults(response.data);
       setSearchTerm('');
       setStatusFilter('All');

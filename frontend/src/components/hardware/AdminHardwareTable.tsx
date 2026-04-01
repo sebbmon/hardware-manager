@@ -45,18 +45,18 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => api.delete(`/admin/hardware/${id}/`),
+    mutationFn: (id: number) => api.delete(`/admin/hardware/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['hardware'] }),
   });
 
   const repairMutation = useMutation({
-    mutationFn: (id: number) => api.post(`/admin/hardware/${id}/mark_in_repair/`),
+    mutationFn: (id: number) => api.post(`/admin/hardware/${id}/mark_in_repair`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['hardware'] }),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<Hardware> }) =>
-      api.patch(`/admin/hardware/${id}/`, data),
+      api.patch(`/admin/hardware/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hardware'] });
       setIsEditModalOpen(false);

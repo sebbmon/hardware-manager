@@ -34,7 +34,7 @@ export const MyRentalsTable = ({ data, isLoading }: MyRentalsTableProps) => {
   const queryClient = useQueryClient();
 
   const returnMutation = useMutation({
-    mutationFn: (hardwareId: number) => api.post(`/hardware/${hardwareId}/return_hardware/`),
+    mutationFn: (hardwareId: number) => api.post(`/hardware/${hardwareId}/return_hardware`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hardware'] });
       queryClient.invalidateQueries({ queryKey: ['my-rentals'] });
