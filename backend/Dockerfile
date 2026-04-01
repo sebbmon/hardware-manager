@@ -16,5 +16,13 @@ COPY . .
 # collect static files
 RUN python manage.py collectstatic --noinput
 
+#
+EXPOSE 8000
+
 #CMD sh -c "python manage.py migrate && python manage.py createsuperuser --noinput || true && gunicorn config.wsgi --bind 0.0.0.0:8000"
-CMD gunicorn config.wsgi:application --bind 0.0.0.0:8000
+#CMD gunicorn config.wsgi:application --bind 0.0.0.0:8000
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
