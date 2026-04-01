@@ -72,7 +72,7 @@ class Hardware(models.Model):
 
     #postgres prod
     class Meta:
-        ordering = ['name']
+        ordering = ['id']
 
     def __str__(self):
         return f"{self.name} ({self.brand})"
