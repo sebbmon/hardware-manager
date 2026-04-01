@@ -5,11 +5,10 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ['127.0.0.1'],
 
   async rewrites() {
-    // Rozpoznajemy środowisko
     const isDev = process.env.NODE_ENV === 'development';
     const baseUrl = isDev
       ? 'http://127.0.0.1:8000'
-      : 'https://hardware-hub-mondel.onrender.com';
+      : process.env.NEXT_PUBLIC_BACKEND_URL;
 
     return [
       {
