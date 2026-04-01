@@ -30,10 +30,10 @@ export const LoginForm = () => {
       await login({ email, password });
       window.location.href = '/dashboard/list';
     } catch (err: any) {
-      // Wyciągamy dane z odpowiedzi
+      // Extract data from response
       const errorData = err.response?.data;
 
-      // Szukamy błędu w "detail", w "non_field_errors", albo w "email"
+      // Search for error in "detail", "non_field_errors", or "email"
       const errorMessage =
         errorData?.detail ||
         (errorData?.non_field_errors && errorData.non_field_errors[0]) ||
