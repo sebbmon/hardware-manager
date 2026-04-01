@@ -20,7 +20,7 @@ api.interceptors.response.use(
         // If token is rejected (401), 
         // forcing cookies to be deleted
         try {
-          await axios.post(`${baseURL}logout/`, {}, { withCredentials: true });
+          await axios.post(`${baseURL}logout`, {}, { withCredentials: true });
         } catch (e) {
           // Ignoring logout errors, because we are redirecting anyway
         }

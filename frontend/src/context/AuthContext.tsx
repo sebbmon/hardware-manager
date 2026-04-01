@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchUser = async () => {
     try {
       // Cookie is sent automatically thanks to withCredentials: true
-      const response = await api.get('/users/me/');
+      const response = await api.get('/users/me');
       setUser(response.data);
       return response.data;
     } catch (err) {
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (credentials: any): Promise<boolean> => {
     try {
       // 1. We send the login data. Backend sets httpOnly cookies.
-      await api.post('/token/', credentials);
+      await api.post('/token', credentials);
 
       // 2. Since the cookie is already in the browser, we get the user data
       const userData = await fetchUser();
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     try {
       // We call the new endpoint so the backend deletes the cookies
-      await api.post('/logout/');
+      await api.post('/logout');
     } catch (error) {
       console.error("Error during logout", error);
     } finally {
