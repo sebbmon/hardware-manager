@@ -70,6 +70,10 @@ class Hardware(models.Model):
         help_text="Unique hardware serial number"
     )
 
+    #postgres prod
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return f"{self.name} ({self.brand})"
 
