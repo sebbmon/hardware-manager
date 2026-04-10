@@ -17,8 +17,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
 
-        // If token is rejected (401), 
-        // forcing cookies to be deleted
+        // If token is rejected (401), forcing cookies to be deleted
         try {
           await axios.post(`${baseURL}logout`, {}, { withCredentials: true });
         } catch (e) {

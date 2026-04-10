@@ -1,7 +1,7 @@
 import json
 from google import genai
 from google.genai import types
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.db import transaction
@@ -10,17 +10,11 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from .models import Hardware, Rental
 from .serializers import HardwareSerializer, RentalSerializer, UserSerializer, CustomTokenObtainPairSerializer
-import re
-#NOT FOR PRODUCTION
-from rest_framework.permissions import AllowAny
 
 class HardwareViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Hardware.objects.all()
     serializer_class = HardwareSerializer
-    #PRODUCTION
     permission_classes = [permissions.IsAuthenticated]
-    #LOCALHOST
-    #permission_classes = [AllowAny]
     filterset_fields = ['status', 'brand', 'name']
     
     @action(detail=True, methods=['post'])
@@ -34,16 +28,6 @@ class HardwareViewSet(viewsets.ReadOnlyModelViewSet):
             # Guard: check if status == 'Available'
             if hardware.status != 'Available':
                 return Response({'detail': 'Equipment is not available for rent.'}, status=status.HTTP_400_BAD_REQUEST)
-                
-            # Guard: check for blocked words in notes
-            '''
-            if hardware.notes:
-                blocked_words = ['swelling', 'damage', 'service']
-                notes_lower = hardware.notes.lower()
-                # Use regex or simple string match to block words
-                if any(word in notes_lower for word in blocked_words):
-                    return Response({'detail': 'Equipment requires service and cannot be rented.'}, status=status.HTTP_400_BAD_REQUEST)
-            '''
                     
             # Change status and create rental
             hardware.status = 'In Use'
@@ -160,7 +144,10 @@ class AdminHardwareViewSet(viewsets.ModelViewSet):
             
             return Response({'detail': 'Equipment marked for repair successfully.'}, status=status.HTTP_200_OK)
 
-class AdminUserViewSet(viewsets.ModelViewSet):
+class AdminUserViewSet(mixins.CreateModelMixin, 
+                       mixins.ListModelMixin, 
+                       mixins.RetrieveModelMixin, 
+                       viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]

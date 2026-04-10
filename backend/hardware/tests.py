@@ -113,3 +113,18 @@ class HardwareTests(APITestCase):
         
         # No operation started - access was also blocked (403 Forbidden)
         self.assertEqual(response_repair.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_admin_cannot_edit_or_delete_users(self):
+        """5. Admin cannot PUT/PATCH/DELETE users (security fix test)"""
+        # login as a admin
+        self.client.force_authenticate(user=self.admin_user)
+        
+        # building path to user details
+        url = reverse('admin-users-detail', kwargs={'pk': self.user.pk})
+        
+        # 1. Attempt to change password (PATCH)
+        response_patch = self.client.patch(url, {'password': 'hacked_password123'})
+        self.assertEqual(response_patch.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        # 2. Attempt to delete user (DELETE)
+        response_delete = self.client.delete(url)
+        self.assertEqual(response_delete.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

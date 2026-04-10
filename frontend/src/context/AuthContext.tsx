@@ -53,6 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // 2. Since the cookie is already in the browser, we get the user data
       const userData = await fetchUser();
 
+      //DEBUGGING
       if (!userData) {
         throw new Error('Login successful, but there was a problem fetching the profile.');
       }
