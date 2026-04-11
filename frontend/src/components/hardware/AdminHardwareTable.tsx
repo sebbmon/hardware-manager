@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import EditHardwareModal from './EditHardwareModal';
+import DeleteHardwareModal from './DeleteHardwareModal';
 
 interface Hardware {
   id: number;
@@ -43,6 +44,8 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
   const [sortConfig, setSortConfig] = useState<{ key: keyof Hardware, direction: 'asc' | 'desc' } | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedHardware, setSelectedHardware] = useState<Hardware | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [hardwareToDelete, setHardwareToDelete] = useState<Hardware | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -236,12 +239,15 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                         {repairMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wrench className="h-4 w-4" />}
                       </button>
                       <button
-                        onClick={() => deleteMutation.mutate(item.id)}
+                        onClick={() => {
+                          setHardwareToDelete(item);
+                          setIsDeleteModalOpen(true);
+                        }}
                         disabled={item.status === 'In Use' || deleteMutation.isPending}
                         title={item.status === 'In Use' ? "Cannot delete rented hardware" : "Delete Hardware"}
                         className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all disabled:opacity-30"
                       >
-                        {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                        {deleteMutation.isPending && hardwareToDelete?.id === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                       </button>
                     </td>
                   </tr>
@@ -330,6 +336,20 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
         }}
         hardware={selectedHardware}
         isSaving={updateMutation.isPending}
+      />
+
+      <DeleteHardwareModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={async () => {
+          if (hardwareToDelete) {
+            await deleteMutation.mutateAsync(hardwareToDelete.id);
+            setIsDeleteModalOpen(false);
+            setHardwareToDelete(null);
+          }
+        }}
+        hardware={hardwareToDelete}
+        isDeleting={deleteMutation.isPending}
       />
     </div>
   );
