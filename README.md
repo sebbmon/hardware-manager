@@ -51,7 +51,7 @@ In a production setup, I would fully migrate away from SQLite and adapt the appl
 
 ---
 
-### 3. Partially functional Django admin panel
+### 3. Partially functional Django admin panel (FIXED)
 
 **Shortcut:**  
 The Django admin panel does not fully support creating new users due to the use of a custom user model.
@@ -78,7 +78,7 @@ Missing improvements:
 
 ## The 24H Roadmap
 If I had 24 hours to improve this project, besides everything listed in "Partial / Missing" and "Shortcuts & Hacks" sections, I would:
-- Implement pagination for scalability
+- Implement pagination for scalability (Partially fixed -frontend only)
 - Improve frontend error handling in some cases
 - Implement "Forgot Password" feature on the Login page
 - Added rental logs for an Administrator (which hardware was rented by whom and when)
