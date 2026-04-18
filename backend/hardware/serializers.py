@@ -7,10 +7,20 @@ User = get_user_model()
 
 class HardwareSerializer(serializers.ModelSerializer):
     serial_number = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    assigned_to = serializers.SerializerMethodField()
 
     class Meta:
         model = Hardware
         fields = '__all__'
+
+    def get_assigned_to(self, obj):
+        request = self.context.get('request')
+        if request and request.user and request.user.is_staff:
+            if obj.status == 'In Use':
+                active_rental = obj.rentals.filter(is_active=True).select_related('user').first()
+                if active_rental and active_rental.user:
+                    return active_rental.user.email
+        return None
 
     def validate_serial_number(self, value):
         if not value or value.strip() == "":

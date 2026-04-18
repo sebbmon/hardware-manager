@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  Edit2
+  Edit2,
+  User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
@@ -31,6 +32,7 @@ interface Hardware {
   serial_number?: string;
   category?: 'laptop' | 'mobile' | 'tablet' | 'monitor' | 'accessory';
   notes?: string;
+  assigned_to?: string | null;
 }
 
 interface AdminHardwareTableProps {
@@ -154,13 +156,16 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
           <table className="w-full text-left text-sm border-collapse table-fixed">
             <thead className="bg-slate-50 border-b border-slate-200 uppercase tracking-wider">
               <tr>
-                {['name', 'brand', 'serial_number', 'added_at', 'status'].map((header) => (
+                {['name', 'brand', 'serial_number', 'added_at', 'assigned_to', 'status'].map((header) => (
                   <th
                     key={header}
-                    className="cursor-pointer px-6 py-4 text-[11px] font-bold text-slate-500 hover:text-slate-900 transition-colors group uppercase"
+                    className={cn(
+                      "cursor-pointer px-6 py-4 text-[11px] font-bold text-slate-500 hover:text-slate-900 transition-colors group uppercase",
+                      header === 'assigned_to' && "text-center"
+                    )}
                     onClick={() => handleSort(header as keyof Hardware)}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className={cn("flex items-center gap-2", header === 'assigned_to' && "justify-center")}>
                       {header.replace('_', ' ')}
                       {sortConfig?.key === header ? (
                         sortConfig.direction === 'asc' ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />
@@ -181,6 +186,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                     <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
+                    <td className="px-6 py-4"><div className="h-4 w-24 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4"><div className="h-6 w-20 rounded bg-slate-100" /></td>
                     <td className="px-6 py-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-slate-100" /></td>
                   </tr>
@@ -198,6 +204,16 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                         <Calendar className="h-3.5 w-3.5" />
                         {new Date(item.added_at).toLocaleDateString()}
                       </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {item.assigned_to ? (
+                        <div className="flex items-center justify-center gap-2 text-slate-700 font-medium">
+                          <User className="h-3.5 w-3.5 text-slate-400" />
+                          {item.assigned_to}
+                        </div>
+                      ) : (
+                        <div className="text-center text-slate-400">-</div>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       {item.status === 'Available' ? (
@@ -254,7 +270,7 @@ export const AdminHardwareTable = ({ data, isLoading }: AdminHardwareTableProps)
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400 italic font-medium">
+                  <td colSpan={7} className="px-6 py-12 text-center text-slate-400 italic font-medium">
                     No hardware found matching your criteria.
                   </td>
                 </tr>
