@@ -78,7 +78,7 @@ Missing improvements:
 
 ## The 24H Roadmap
 If I had 24 hours to improve this project, besides everything listed in "Partial / Missing" and "Shortcuts & Hacks" sections, I would:
-- Implement pagination for scalability (Partially fixed -frontend only)
+- Implement pagination for scalability (Partially fixed - frontend only)
 - Improve frontend error handling in some cases
 - Implement "Forgot Password" feature on the Login page
 - Added rental logs for an Administrator (which hardware was rented by whom and when)
