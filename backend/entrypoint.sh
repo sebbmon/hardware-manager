@@ -7,7 +7,7 @@ python manage.py migrate --noinput
 echo "=== Optional seed data ==="
 if [ "$RUN_SEED" = "true" ]; then
   echo "Seed enabled"
-  python manage.py load_seed_data || echo "Seed skipped (already exists or failed safely)"
+  python manage.py load_seed_data seed_data.json || echo "Seed skipped (already exists or failed safely)"
 else
   echo "Seed disabled"
 fi
