@@ -118,7 +118,7 @@ class Command(BaseCommand):
                     
                 # 8. Creating Hardware record (Enforcing original JSON ID)
                 hardware = Hardware.objects.create(
-                    id=item_id,
+                    #id=item_id,
                     name=name,
                     brand=brand,
                     purchase_date=purchase_date,

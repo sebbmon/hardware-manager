@@ -180,7 +180,7 @@ Follow these instructions to run the project locally.
 - **Frontend:** Next.js app is ideally deployed to platforms like **Vercel** or **Render**. Ensure the `NEXT_PUBLIC_BACKEND_URL` points to the hosted backend URL (e.g., your Render domain).
 
 ## Security Notes
-- JWT access and refresh tokens are securely embedded in `HttpOnly`, `Secure`, and `Lax` cookies, preventing XSS-based token exfiltration.
+- JWT access and refresh tokens are securely embedded in `HttpOnly`, `Secure`, and `Strict` cookies, preventing XSS-based token exfiltration.
 - Guard clauses and atomic DB transactions limit race-conditions when multiple users attempt to rent single-quantity hardware simultaneously.
 
 ---
