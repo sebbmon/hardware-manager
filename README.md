@@ -95,7 +95,7 @@ If I had 24 hours to improve this project, besides everything listed in "Partial
 ### Backend
 - **Framework:** Django & Django Rest Framework (DRF)
 - **Database:** SQLite (Local) & PostgreSQL (Production)
-- **Authentication:** JWT via HTTP-only Cookies (`access_token` and `refresh_token`, SameSite=Lax)
+- **Authentication:** JWT via HTTP-only Cookies (`access_token` and `refresh_token`, SameSite=Strict)
 - **Semantic Search AI Engine:** Google AI / Gemini API (`gemini-2.5-flash-lite`)
 
 ---
