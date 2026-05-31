@@ -70,8 +70,8 @@ export const AdminForms = () => {
   const handleAddUser = () => {
     setEmailError('');
 
-    if (!email.endsWith('@booksy.com')) {
-      setEmailError('Invalid domain. Please use @booksy.com');
+    if (!email.endsWith('@pk.edu.pl')) {
+      setEmailError('Invalid domain. Please use @pk.edu.pl');
       return;
     }
 

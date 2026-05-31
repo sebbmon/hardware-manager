@@ -43,8 +43,8 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def validate_email(self, value):
-        if not value.endswith('@booksy.com'):
-            raise serializers.ValidationError("Invalid domain. Please use @booksy.com")
+        if not value.endswith('@pk.edu.pl'):
+            raise serializers.ValidationError("Invalid domain. Please use @pk.edu.pl")
         return value
     
     def create(self, validated_data):
@@ -58,8 +58,8 @@ class UserSerializer(serializers.ModelSerializer):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         email = attrs.get('email', '')
-        if not email.endswith('@booksy.com'):
-            raise serializers.ValidationError("Invalid domain. Please use @booksy.com")
+        if not email.endswith('@pk.edu.pl'):
+            raise serializers.ValidationError("Invalid domain. Please use @pk.edu.pl")
             
         return super().validate(attrs)
 

@@ -19,8 +19,8 @@ export const LoginForm = () => {
     setDomainError('');
 
     // domain validation
-    if (!email.endsWith('@booksy.com')) {
-      setDomainError('Invalid domain. Please use @booksy.com');
+    if (!email.endsWith('@pk.edu.pl')) {
+      setDomainError('Invalid domain. Please use @pk.edu.pl');
       return;
     }
 
@@ -86,7 +86,7 @@ export const LoginForm = () => {
                       ? "border-red-300 focus:border-red-500 focus:ring-red-50"
                       : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-50"
                   )}
-                  placeholder="john@booksy.com"
+                  placeholder="john@pk.edu.pl"
                 />
               </div>
               {domainError && (
