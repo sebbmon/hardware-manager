@@ -159,7 +159,7 @@ export const AdminForms = () => {
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Email</label>
             <input
               type="email"
-              placeholder="e.g. john@booksy.com"
+              placeholder="e.g. john@pk.edu.pl"
               className={cn(
                 "w-full rounded-lg border bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 transition-all font-medium",
                 emailError
